@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>dedecms网站搭建</title>
+    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<ol>
+<li>下载织梦开源程序</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
+<ol start="2">
+<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
+<li>访问127.0.0.1的DedeCMS网址</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
+<ol start="4">
+<li>点击继续</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
+<ol start="5">
+<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
+<ol start="6">
+<li>安装完成，登录网站后台</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
+<ol start="7">
+<li>登陆成功！</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>环境搭建</category>
+      </categories>
+  </entry>
+</search>
