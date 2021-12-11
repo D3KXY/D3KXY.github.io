@@ -1,38 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>【1039家校通】SQL注入和后台GETSHELL</title>
-    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
-&#x2F;Student&#x2F;StudentLogin.aspx
-&#x2F;Teacher&#x2F;Index.aspx
-&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
-<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
-<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
-<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
-<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
-&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
-<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2014.7</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【CVE-2020-17519/17518】Apache Flink任意文件上传/读取漏洞复现</title>
     <url>/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
@@ -89,6 +57,38 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </categories>
       <tags>
         <tag>2021.1</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【1039家校通】SQL注入和后台GETSHELL</title>
+    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
+&#x2F;Student&#x2F;StudentLogin.aspx
+&#x2F;Teacher&#x2F;Index.aspx
+&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
+<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
+<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
+<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
+<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
+&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
+<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2014.7</tag>
       </tags>
   </entry>
   <entry>
@@ -714,6 +714,42 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </tags>
   </entry>
   <entry>
+    <title>dedecms网站搭建</title>
+    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<ol>
+<li>下载织梦开源程序</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
+<ol start="2">
+<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
+<li>访问127.0.0.1的DedeCMS网址</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
+<ol start="4">
+<li>点击继续</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
+<ol start="5">
+<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
+<ol start="6">
+<li>安装完成，登录网站后台</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
+<ol start="7">
+<li>登陆成功！</li>
+</ol>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
+<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>环境搭建</category>
+      </categories>
+  </entry>
+  <entry>
     <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
     <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
@@ -887,42 +923,6 @@ int main(int argc, char *argv[])
       <tags>
         <tag>2021.4</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>dedecms网站搭建</title>
-    <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<ol>
-<li>下载织梦开源程序</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
-<ol start="2">
-<li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
-<li>访问127.0.0.1的DedeCMS网址</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/2.png" alt="图片"></p>
-<ol start="4">
-<li>点击继续</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/3.png" alt="图片"></p>
-<ol start="5">
-<li>点继续，进入参数配置页面，数据库主机：localhost，数据库用户：root，数据库密码：root，对于PHPstudy本地环境来说，这几项是固定的，在这里的数据库名称可以更改，也可以不更改。接着再自己设置一下用户名、密码、网站名称、管理员邮箱即可点击继续安装。</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/4.png" alt="图片"></p>
-<ol start="6">
-<li>安装完成，登录网站后台</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/5.png" alt="图片"></p>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/6.png" alt="图片"></p>
-<ol start="7">
-<li>登陆成功！</li>
-</ol>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/7.png" alt="图片"></p>
-<p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/8.png" alt="图片"></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>环境搭建</category>
-      </categories>
   </entry>
   <entry>
     <title>【MS17-010】永恒之蓝漏洞复现</title>
