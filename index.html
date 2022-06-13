@@ -155,6 +155,65 @@
     
     
     <article
+  id="post-HackDemo钓鱼篇②——U盘钓鱼"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2022/06/10/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/"
+    >HackDemo钓鱼篇②——U盘钓鱼</a> 
+</h2>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2022/06/10/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/" class="article-date">
+  <time datetime="2022-06-10T04:30:26.000Z" itemprop="datePublished">2022-06-10</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%A4%BE%E5%B7%A5%E5%AE%89%E5%85%A8/">社工安全</a> / <a class="article-category-link" href="/categories/%E7%A4%BE%E5%B7%A5%E5%AE%89%E5%85%A8/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>最近接触到各种钓鱼方法，研究到U盘钓鱼的时候，决定搞个BadUSB玩玩。BadUSB 漏洞是由安全研究人员Karsten Nohl 和 Jakob Lell 在 2014 年黑帽会议上首次发现并暴露出来的，这也就让USB安全和几乎所有和USB相关的设备（包括具有USB端口的电脑）都陷入相当危险的状态。</p>
+<p>就狭义来说，BadUSB是指形似 U 盘的设备，内部的电路在上电之后会被系统识别为键盘，此时该设备内部的芯片开始与电脑进行键盘通讯，仿照人的输入习惯，来操作电脑，以此达到骇入电脑的目的。</p>
+<p>就广义来说，BadUSB是指一切会被电脑识别为 HID 设备的，外观却不像键盘的电子设备。现阶段有的 BadUSB是形似数据线的，有的则是手机加定制内核，以发挥 BadUSB 的作用，更有甚者，将 BadUSB 开发为模块，可以嵌入任意的带 USB 接口的设备中。</p> 
+      <a class="article-more-link" href="/2022/06/10/HackDemo%E9%92%93%E9%B1%BC%E7%AF%87%E2%91%A1%E2%80%94%E2%80%94U%E7%9B%98%E9%92%93%E9%B1%BC/"
+        >阅读更多</a
+      >
+       
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/2022-6/" rel="tag">2022.6</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+    
+</article>
+
+    
+    <article
   id="post-HackDemo钓鱼篇①——WiFi钓鱼"
   class="article article-type-post"
   itemscope
@@ -663,63 +722,6 @@ app&#x3D;&quot;Apache‐Flink&quot; &amp;&amp; country&#x3D;&quot;CN&quot;<span 
     <footer class="article-footer">
        
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/2014-7/" rel="tag">2014.7</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-    
-</article>
-
-    
-    <article
-  id="post-致远OA-ajax.do任意文件上传漏洞复现"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"
-    >【致远OA】ajax.do任意文件上传漏洞复现</a> 
-</h2>
- 
-
-      
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="article-date">
-  <time datetime="2021-01-21T16:30:26.000Z" itemprop="datePublished">2021-01-22</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a> / <a class="article-category-link" href="/categories/Web%E5%AE%89%E5%85%A8/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
-  </div>
-   
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>致远OA是一套办公协同管理软件。近日，奇安信CERT监测到致远OA的相关漏洞信息。由于致远OA旧版本某些接口存在未授权访问，以及部分函数存在过滤不足，攻击者通过构造恶意请求，可在无需登录的情况下上传恶意脚本文件，从而控制服务器。致远OA官方已针对该漏洞提供补丁。鉴于漏洞危害较大，建议用户尽快应用补丁更新。</p> 
-      <a class="article-more-link" href="/2021/01/22/%E8%87%B4%E8%BF%9COA-ajax.do%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"
-        >阅读更多</a
-      >
-       
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/2021-1/" rel="tag">2021.1</a></li></ul>
 
     </footer>
   </div>
